@@ -33,11 +33,28 @@ final class UpdaterManager: NSObject, ObservableObject {
     @Published var statusText: String = ""
     @Published var updateAvailable = false
     @Published var latestVersionString: String? = nil
+    
+    // Automatic update preference (default: false)
+    @Published var automaticallyChecksForUpdates: Bool = false {
+        didSet {
+            UserDefaults.standard.set(automaticallyChecksForUpdates, forKey: "SUEnableAutomaticChecks")
+            updater.automaticallyChecksForUpdates = automaticallyChecksForUpdates
+            print("[Sparkle] Automatic checks set to: \(automaticallyChecksForUpdates)")
+            track("sparkle_auto_checks_changed", ["enabled": automaticallyChecksForUpdates])
+        }
+    }
 
     private let logger = Logger(subsystem: "com.dayflow.app", category: "sparkle")
+    
+    private let autoUpdateKey = "SUEnableAutomaticChecks"
 
     private override init() {
         super.init()
+        
+        // Load automatic update preference (default: false)
+        let savedPreference = UserDefaults.standard.object(forKey: "SUEnableAutomaticChecks") as? Bool
+        let shouldAutoUpdate = savedPreference ?? false
+        automaticallyChecksForUpdates = shouldAutoUpdate
 
         // Print what Sparkle thinks the settings are *before* starting:
         print("[Sparkle] bundleId=\(Bundle.main.bundleIdentifier ?? "nil")")
@@ -46,6 +63,8 @@ final class UpdaterManager: NSObject, ObservableObject {
 
         do {
             try updater.start()
+            // Set automatic checks based on user preference (default: false)
+            updater.automaticallyChecksForUpdates = shouldAutoUpdate
             print("[Sparkle] updater.start() OK")
             print("[Sparkle] feedURL=\(updater.feedURL?.absoluteString ?? "nil")")
             print("[Sparkle] autoChecks=\(updater.automaticallyChecksForUpdates)")

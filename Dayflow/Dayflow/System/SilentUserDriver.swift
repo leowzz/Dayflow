@@ -4,16 +4,21 @@ import Sparkle
 // A no-UI user driver that silently installs updates immediately
 final class SilentUserDriver: NSObject, SPUUserDriver {
     func show(_ request: SPUUpdatePermissionRequest, reply: @escaping (SUUpdatePermissionResponse) -> Void) {
-        print("[Sparkle] Permission request; responding with automatic checks + downloads")
-        // Enable automatic checks & downloads by default; do not send system profile
+        print("[Sparkle] Permission request; checking user preference for automatic updates")
+        // Check user preference (default: false - automatic updates disabled)
+        let savedPreference = UserDefaults.standard.object(forKey: "SUEnableAutomaticChecks") as? Bool
+        let shouldAutoUpdate = savedPreference ?? false
+        print("[Sparkle] Automatic checks preference: \(shouldAutoUpdate)")
+        
+        // Enable automatic checks & downloads only if user has enabled it
         let response = SUUpdatePermissionResponse(
-            automaticUpdateChecks: true,
-            automaticUpdateDownloading: NSNumber(value: true),
+            automaticUpdateChecks: shouldAutoUpdate,
+            automaticUpdateDownloading: NSNumber(value: shouldAutoUpdate),
             sendSystemProfile: false
         )
         AnalyticsService.shared.capture("sparkle_permission_requested", [
-            "automatic_checks": true,
-            "automatic_downloads": true
+            "automatic_checks": shouldAutoUpdate,
+            "automatic_downloads": shouldAutoUpdate
         ])
         reply(response)
     }

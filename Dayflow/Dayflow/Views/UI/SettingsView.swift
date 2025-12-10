@@ -48,6 +48,7 @@ struct SettingsView: View {
     @Namespace private var sidebarSelectionNamespace
 
     @ObservedObject private var launchAtLoginManager = LaunchAtLoginManager.shared
+    @ObservedObject private var updaterManager = UpdaterManager.shared
 
     // Provider state
     @State private var currentProvider: String = "gemini"
@@ -1029,6 +1030,20 @@ struct SettingsView: View {
                     .toggleStyle(.switch)
 
                     Text("Keeps the menu bar controller running right after you sign in so capture can resume instantly.")
+                        .font(.custom("Nunito", size: 11.5))
+                        .foregroundColor(.black.opacity(0.5))
+
+                    Toggle(isOn: Binding(
+                        get: { updaterManager.automaticallyChecksForUpdates },
+                        set: { updaterManager.automaticallyChecksForUpdates = $0 }
+                    )) {
+                        Text("Automatically check for updates")
+                            .font(.custom("Nunito", size: 13))
+                            .foregroundColor(.black.opacity(0.7))
+                    }
+                    .toggleStyle(.switch)
+
+                    Text("When enabled, Dayflow will automatically check for updates in the background.")
                         .font(.custom("Nunito", size: 11.5))
                         .foregroundColor(.black.opacity(0.5))
 
