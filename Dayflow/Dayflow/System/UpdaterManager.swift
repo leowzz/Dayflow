@@ -82,6 +82,49 @@ final class UpdaterManager: NSObject, ObservableObject {
 }
 
 extension UpdaterManager: SPUUpdaterDelegate {
+  nonisolated func feedParameters(
+    for updater: SPUUpdater,
+    sendingSystemProfile sendingProfile: Bool
+  ) -> [[String: String]] {
+    var parameters: [[String: String]] = [
+      [
+        "key": "analytics_opt_in",
+        "value": AnalyticsService.shared.isOptedIn ? "1" : "0",
+        "displayKey": "Analytics opt-in",
+        "displayValue": AnalyticsService.shared.isOptedIn ? "Enabled" : "Disabled",
+      ]
+    ]
+
+    if let postHogId = AnalyticsService.shared.postHogDistinctIdForAppcast() {
+      parameters.append([
+        "key": "phid",
+        "value": postHogId,
+        "displayKey": "Anonymous analytics ID",
+        "displayValue": "Present",
+      ])
+    }
+
+    let info = Bundle.main.infoDictionary
+    if let version = info?["CFBundleShortVersionString"] as? String, !version.isEmpty {
+      parameters.append([
+        "key": "v",
+        "value": version,
+        "displayKey": "Version",
+        "displayValue": version,
+      ])
+    }
+    if let build = info?["CFBundleVersion"] as? String, !build.isEmpty {
+      parameters.append([
+        "key": "b",
+        "value": build,
+        "displayKey": "Build",
+        "displayValue": build,
+      ])
+    }
+
+    return parameters
+  }
+
   private nonisolated static func isNoUpdateSparkleError(domain: String, code: Int) -> Bool {
     domain == "SUSparkleErrorDomain" && code == 1001
   }
