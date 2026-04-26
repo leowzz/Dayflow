@@ -82,7 +82,7 @@ struct OnboardingFlow: View {
       case .referral:
         OnboardingPrototypeReferralStep(
           onContinue: { option, detail in
-            var payload: [String: String] = [
+            var payload: [String: Any] = [
               "source": option.analyticsValue,
               "surface": "onboarding_referral",
             ]
@@ -92,7 +92,7 @@ struct OnboardingFlow: View {
             }
 
             AnalyticsService.shared.capture("onboarding_referral", payload)
-            advance()
+            advance(extraProps: payload)
           }
         )
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -106,7 +106,7 @@ struct OnboardingFlow: View {
             userHasPaidAI = hasPaidAI
             savedHasPaidAISelection = hasPaidAI ? "yes" : "no"
             AnalyticsService.shared.capture("onboarding_preferences", ["has_paid_ai": hasPaidAI])
-            advance()
+            advance(extraProps: ["has_paid_ai": hasPaidAI])
           }
         )
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -135,7 +135,7 @@ struct OnboardingFlow: View {
             }
             AnalyticsService.shared.capture("llm_provider_selected", props)
             AnalyticsService.shared.setPersonProperties(["current_llm_provider": providerID])
-            advance()
+            advance(extraProps: props)
           }
         )
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -213,6 +213,7 @@ struct OnboardingFlow: View {
             savedHasPaidAISelection = ""
             AnalyticsService.shared.capture("onboarding_completed")
             AnalyticsService.shared.setPersonProperties(["onboarding_status": "completed"])
+            AnalyticsService.shared.flush()
           }
         )
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -284,7 +285,7 @@ struct OnboardingFlow: View {
     AnalyticsService.shared.capture("onboarding_step_completed", props)
   }
 
-  private func advance(selectedRole: String? = nil) {
+  private func advance(selectedRole: String? = nil, extraProps: [String: Any] = [:]) {
     switch step {
     case .introVideo:
       markStepCompleted(step)
@@ -296,15 +297,15 @@ struct OnboardingFlow: View {
       step.next()
       savedStepRawValue = step.rawValue
     case .referral:
-      markStepCompleted(step)
+      markStepCompleted(step, extraProps: extraProps)
       step.next()
       savedStepRawValue = step.rawValue
     case .preferences:
-      markStepCompleted(step)
+      markStepCompleted(step, extraProps: extraProps)
       step.next()
       savedStepRawValue = step.rawValue
     case .llmSelection:
-      markStepCompleted(step)
+      markStepCompleted(step, extraProps: extraProps)
       let nextStep: OnboardingStep = (selectedProvider == "dayflow") ? .categories : .llmSetup
       setStep(nextStep)
     case .llmSetup:
