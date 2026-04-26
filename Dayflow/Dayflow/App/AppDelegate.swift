@@ -13,6 +13,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
   enum PendingNotificationNavigationDestination: Equatable {
     case journal
     case daily(day: String?)
+    case weekly
   }
 
   // Controls whether the app is allowed to terminate.
@@ -304,6 +305,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
       AnalyticsService.shared.capture("onboarding_abandoned", ["last_step": stepName])
     }
     AnalyticsService.shared.capture("app_terminated")
+    AnalyticsService.shared.flush()
   }
 
   private func flushPendingDeepLinks() {
