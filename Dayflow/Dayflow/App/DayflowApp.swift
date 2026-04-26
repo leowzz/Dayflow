@@ -178,12 +178,17 @@ struct DayflowApp: App {
         MainWindowRegistrationView()
 
         if didOnboard {
-          Image("MainUIBackground")
-            .resizable()
-            .scaledToFill()
-            .ignoresSafeArea()
-            .allowsHitTesting(false)
-            .accessibilityHidden(true)
+          ZStack {
+            Image("MainUIBackground")
+              .resizable()
+              .scaledToFill()
+
+            Color(red: 0.98, green: 0.96, blue: 0.93)
+              .opacity(0.4)
+          }
+          .ignoresSafeArea()
+          .allowsHitTesting(false)
+          .accessibilityHidden(true)
         }
       }
       .onAppear {
@@ -203,6 +208,7 @@ struct DayflowApp: App {
     .windowStyle(.hiddenTitleBar)
     .windowResizability(.contentMinSize)
     .defaultSize(width: 1195, height: 675)
+
     .commands {
       // Remove the "New Window" command if you want a single window app
       CommandGroup(replacing: .newItem) {}
@@ -249,6 +255,7 @@ struct DayflowApp: App {
       }
     }
     .defaultSize(width: 1200, height: 800)
+
   }
 
   private var hasPendingNotificationNavigation: Bool {
@@ -271,6 +278,8 @@ struct DayflowApp: App {
         )
       case .daily:
         NotificationCenter.default.post(name: .navigateToDaily, object: nil)
+      case .weekly:
+        NotificationCenter.default.post(name: .navigateToWeekly, object: nil)
       case .journal:
         NotificationCenter.default.post(name: .navigateToJournal, object: nil)
       }
@@ -285,6 +294,7 @@ extension Notification.Name {
   static let showWhatsNew = Notification.Name("showWhatsNew")
   static let navigateToJournal = Notification.Name("navigateToJournal")
   static let navigateToDaily = Notification.Name("navigateToDaily")
+  static let navigateToWeekly = Notification.Name("navigateToWeekly")
   static let timelineDataUpdated = Notification.Name("timelineDataUpdated")
   static let showTimelineFailureToast = Notification.Name("showTimelineFailureToast")
   static let showScreenRecordingPermissionNotice = Notification.Name(
