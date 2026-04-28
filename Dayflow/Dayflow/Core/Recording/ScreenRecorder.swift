@@ -352,21 +352,49 @@ final class ScreenRecorder: NSObject, @unchecked Sendable {
     let idleSecondsAtCapture = InputIdleSnapshot.currentIdleSeconds()
 
     do {
+      let captureSize = scaledCaptureSize(for: display)
+      if let blockedApplication = await MainActor.run(body: {
+        RecordingPrivacyPreferences.frontmostBlockedApplication()
+      }) {
+        guard
+          let jpegData = await MainActor.run(body: {
+            RecordingPrivacyPlaceholder.jpegData(
+              size: CGSize(width: captureSize.width, height: captureSize.height),
+              quality: Config.jpegQuality,
+              applicationName: blockedApplication.name
+            )
+          })
+        else {
+          throw ScreenRecorderError.imageConversionFailed
+        }
+        _ = try saveScreenshotData(
+          jpegData,
+          capturedAt: captureTime,
+          idleSecondsAtCapture: idleSecondsAtCapture
+        )
+        dbg("🔒 Screenshot redacted for blocked foreground application")
+        return
+      }
+
       // 1. Create content filter for the display
-      let filter = SCContentFilter(display: display, excludingWindows: [])
+      let excludedApplications =
+        cachedContent.map {
+          RecordingPrivacyPreferences.blockedScreenCaptureApplications(in: $0)
+        } ?? []
+      let filter =
+        excludedApplications.isEmpty
+        ? SCContentFilter(display: display, excludingWindows: [])
+        : SCContentFilter(
+          display: display,
+          excludingApplications: excludedApplications,
+          exceptingWindows: []
+        )
 
       // 2. Configure screenshot
       let config = SCStreamConfiguration()
 
-      // Calculate dimensions to maintain aspect ratio at ~1080p
-      let aspectRatio = Double(display.width) / Double(display.height)
-      var targetWidth = Int(Double(Config.targetHeight) * aspectRatio)
-      if targetWidth % 2 != 0 { targetWidth += 1 }  // Ensure even
-      var targetHeight = Int(Config.targetHeight)
-      if targetHeight % 2 != 0 { targetHeight += 1 }
-
-      config.width = targetWidth
-      config.height = targetHeight
+      config.width = captureSize.width
+      config.height = captureSize.height
       config.scalesToFit = true
       config.showsCursor = true
 
@@ -381,13 +409,9 @@ final class ScreenRecorder: NSObject, @unchecked Sendable {
         throw ScreenRecorderError.imageConversionFailed
       }
 
-      // 5. Save to file
-      let fileURL = StorageManager.shared.nextScreenshotURL()
-      try jpegData.write(to: fileURL)
-
-      // 6. Register in database
-      _ = StorageManager.shared.saveScreenshot(
-        url: fileURL,
+      // 5. Save to disk and register in the database
+      let fileURL = try saveScreenshotData(
+        jpegData,
         capturedAt: captureTime,
         idleSecondsAtCapture: idleSecondsAtCapture
       )
@@ -408,6 +432,31 @@ final class ScreenRecorder: NSObject, @unchecked Sendable {
         Task { await refreshDisplay() }
       }
     }
+  }
+
+  private func scaledCaptureSize(for display: SCDisplay) -> (width: Int, height: Int) {
+    let aspectRatio = Double(display.width) / Double(display.height)
+    var targetWidth = Int(Double(Config.targetHeight) * aspectRatio)
+    if targetWidth % 2 != 0 { targetWidth += 1 }
+    var targetHeight = Int(Config.targetHeight)
+    if targetHeight % 2 != 0 { targetHeight += 1 }
+    return (targetWidth, targetHeight)
+  }
+
+  private func saveScreenshotData(
+    _ jpegData: Data,
+    capturedAt: Date,
+    idleSecondsAtCapture: Int?
+  ) throws -> URL {
+    let fileURL = StorageManager.shared.nextScreenshotURL()
+    try jpegData.write(to: fileURL)
+
+    _ = StorageManager.shared.saveScreenshot(
+      url: fileURL,
+      capturedAt: capturedAt,
+      idleSecondsAtCapture: idleSecondsAtCapture
+    )
+    return fileURL
   }
 
   private func refreshDisplay() async {
