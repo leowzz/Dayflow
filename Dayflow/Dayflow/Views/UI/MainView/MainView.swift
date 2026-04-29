@@ -118,12 +118,9 @@ struct MainView: View {
     }
 
     AnalyticsService.shared.capture(
-      DailyBadgeExperiment.openedAfterReadyEvent,
+      "daily_opened_after_recap_ready",
       [
         "target_day": pendingContext.targetDay ?? "unknown",
-        "experiment": DailyBadgeExperiment.featureFlagKey,
-        "variant": pendingContext.experimentVariant,
-        "badge_enabled": pendingContext.experimentVariant == DailyBadgeExperiment.badgeVariant,
         "source": source,
       ])
     return true
