@@ -8,20 +8,10 @@
 import AppKit
 import SwiftUI
 
-enum DailyBadgeExperiment {
-  static let featureFlagKey = "daily_notification_badge_exp"
-  static let controlVariant = "control"
-  static let badgeVariant = "badge"
-  static let exposureEvent = "daily_badge_exposure"
-  static let shownEvent = "daily_badge_shown"
-  static let openedAfterReadyEvent = "daily_opened_after_recap_ready"
-}
-
 @MainActor
 final class NotificationBadgeManager: ObservableObject {
   struct PendingDailyRecapContext {
     let targetDay: String?
-    let experimentVariant: String
   }
 
   static let shared = NotificationBadgeManager()
@@ -36,11 +26,9 @@ final class NotificationBadgeManager: ObservableObject {
   private let pendingDailyReadyKey = "notificationBadge.pendingDailyReady"
   private let pendingDailyVisibleKey = "notificationBadge.pendingDailyVisible"
   private let pendingDailyTargetDayKey = "notificationBadge.pendingDailyTargetDay"
-  private let pendingDailyVariantKey = "notificationBadge.pendingDailyVariant"
 
   private var hasPendingDailyReady = false
   private var pendingDailyTargetDay: String?
-  private var pendingDailyExperimentVariant: String?
 
   private init() {
     restoreDailyState()
@@ -61,16 +49,11 @@ final class NotificationBadgeManager: ObservableObject {
     refreshDockBadge()
   }
 
-  /// Tracks that a Daily recap is ready and optionally shows a visible badge for it.
-  func registerDailyRecapReady(
-    forDay day: String,
-    experimentVariant: String,
-    showBadge: Bool
-  ) {
+  /// Tracks that a Daily recap is ready and shows its visible badge.
+  func registerDailyRecapReady(forDay day: String) {
     hasPendingDailyReady = true
-    hasPendingDailyRecap = showBadge
+    hasPendingDailyRecap = true
     pendingDailyTargetDay = day.isEmpty ? nil : day
-    pendingDailyExperimentVariant = experimentVariant
     persistDailyState()
     refreshDockBadge()
   }
@@ -86,10 +69,7 @@ final class NotificationBadgeManager: ObservableObject {
   func consumePendingDailyRecapContext() -> PendingDailyRecapContext? {
     guard hasPendingDailyReady else { return nil }
 
-    let context = PendingDailyRecapContext(
-      targetDay: pendingDailyTargetDay,
-      experimentVariant: pendingDailyExperimentVariant ?? DailyBadgeExperiment.controlVariant
-    )
+    let context = PendingDailyRecapContext(targetDay: pendingDailyTargetDay)
     clearPendingDailyRecap()
     return context
   }
@@ -103,7 +83,6 @@ final class NotificationBadgeManager: ObservableObject {
     hasPendingDailyReady = false
     hasPendingDailyRecap = false
     pendingDailyTargetDay = nil
-    pendingDailyExperimentVariant = nil
     persistDailyState()
     refreshDockBadge()
   }
@@ -117,18 +96,11 @@ final class NotificationBadgeManager: ObservableObject {
     } else {
       defaults.removeObject(forKey: pendingDailyTargetDayKey)
     }
-
-    if let pendingDailyExperimentVariant {
-      defaults.set(pendingDailyExperimentVariant, forKey: pendingDailyVariantKey)
-    } else {
-      defaults.removeObject(forKey: pendingDailyVariantKey)
-    }
   }
 
   private func restoreDailyState() {
     hasPendingDailyReady = defaults.bool(forKey: pendingDailyReadyKey)
     hasPendingDailyRecap = defaults.bool(forKey: pendingDailyVisibleKey)
     pendingDailyTargetDay = defaults.string(forKey: pendingDailyTargetDayKey)
-    pendingDailyExperimentVariant = defaults.string(forKey: pendingDailyVariantKey)
   }
 }
