@@ -19,9 +19,10 @@ struct WeeklyHeader: View {
       .pointingHandCursorOnHover(reassertOnPressEnd: true)
 
       Text(title)
-        .font(.custom("InstrumentSerif-Regular", size: 24))
+        .font(.custom("InstrumentSerif-Regular", size: 20))
         .foregroundStyle(Color.black)
         .multilineTextAlignment(.center)
+        .frame(width: 344)
 
       Button(action: onNext) {
         Image("CalendarRightButton")
@@ -35,5 +36,6 @@ struct WeeklyHeader: View {
       .pointingHandCursorOnHover(enabled: canNavigateForward, reassertOnPressEnd: true)
     }
     .frame(maxWidth: .infinity)
+    .frame(height: 29)
   }
 }
