@@ -10,6 +10,7 @@ struct DayflowAuthUser: Codable, Equatable {
 struct DayflowEntitlement: Codable, Equatable {
   let plan: String
   let status: String
+  let source: String?
   let currentPeriodEnd: String?
   let stripeCustomerId: String?
   let stripeSubscriptionId: String?
@@ -17,6 +18,7 @@ struct DayflowEntitlement: Codable, Equatable {
   static let free = DayflowEntitlement(
     plan: "free",
     status: "inactive",
+    source: nil,
     currentPeriodEnd: nil,
     stripeCustomerId: nil,
     stripeSubscriptionId: nil
@@ -29,6 +31,7 @@ struct DayflowEntitlement: Codable, Equatable {
   private enum CodingKeys: String, CodingKey {
     case plan
     case status
+    case source
     case currentPeriodEnd = "current_period_end"
     case stripeCustomerId = "stripe_customer_id"
     case stripeSubscriptionId = "stripe_subscription_id"
@@ -117,14 +120,19 @@ final class DayflowAuthManager: ObservableObject {
     }
   }
 
-  func verifyCode(_ code: String) async {
+  func verifyCode(_ code: String, for emailAddress: String? = nil) async {
     let digits = code.filter(\.isNumber)
     guard digits.count == 6 else {
       errorText = "Enter the 6 digit code."
       return
     }
-    guard let email = pendingEmail else {
+    let explicitEmail = emailAddress.map(normalizedEmail)
+    guard let email = explicitEmail ?? pendingEmail else {
       errorText = "Start with your email first."
+      return
+    }
+    guard isLikelyEmail(email) else {
+      errorText = "Enter a valid email address."
       return
     }
 
@@ -204,6 +212,27 @@ final class DayflowAuthManager: ObservableObject {
 
       NSWorkspace.shared.open(url)
       statusText = "Opened Stripe checkout in your browser."
+      errorText = nil
+    }
+  }
+
+  func openBillingPortal() async {
+    guard let token = retrieveSessionToken() else {
+      errorText = "Sign in first."
+      return
+    }
+
+    await perform {
+      var request = try makeRequest(path: "/v1/billing/portal", method: "POST")
+      request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+
+      let response: BillingPortalResponse = try await send(request)
+      guard let url = URL(string: response.url) else {
+        throw DayflowAuthError.message("Stripe returned an invalid billing link.")
+      }
+
+      NSWorkspace.shared.open(url)
+      statusText = "Opened Stripe billing in your browser."
       errorText = nil
     }
   }
@@ -406,6 +435,10 @@ private struct BillingCheckoutResponse: Codable {
 
 private struct BillingCheckoutRequest: Codable {
   let interval: DayflowBillingInterval
+}
+
+private struct BillingPortalResponse: Codable {
+  let url: String
 }
 
 private struct BackendErrorResponse: Codable {
