@@ -31,7 +31,7 @@ struct SettingsView: View {
     }
   }
 
-  @State private var selectedTab: SettingsTab = .storage
+  @State private var selectedTab: SettingsTab = .account
 
   @Namespace private var sidebarSelectionNamespace
 
@@ -89,6 +89,7 @@ struct SettingsView: View {
         .frame(width: proxy.size.width, height: proxy.size.height, alignment: .topLeading)
     }
     .onAppear {
+      DayflowAuthManager.shared.loadStoredSessionIfNeeded()
       providersViewModel.handleOnAppear()
       otherViewModel.refreshAnalyticsState()
       storageViewModel.refreshStorageIfNeeded(isStorageTab: selectedTab == .storage)
@@ -106,6 +107,12 @@ struct SettingsView: View {
       guard selectedTab != .providers else { return }
       withAnimation(.easeOut(duration: 0.18)) {
         selectedTab = .providers
+      }
+    }
+    .onReceive(NotificationCenter.default.publisher(for: .openAccountSettings)) { _ in
+      guard selectedTab != .account else { return }
+      withAnimation(.easeOut(duration: 0.18)) {
+        selectedTab = .account
       }
     }
   }
