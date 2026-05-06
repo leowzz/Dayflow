@@ -34,6 +34,7 @@ struct MainView: View {
   @State var hasAnyActivities: Bool = true
   @State var refreshActivitiesTrigger: Int = 0
   @ObservedObject var inactivity = InactivityMonitor.shared
+  @ObservedObject var pauseManager = PauseManager.shared
 
   // Animation states for orchestrated entrance - Emil Kowalski principles
   @State var logoScale: CGFloat = 0.8
@@ -70,6 +71,8 @@ struct MainView: View {
   @State var timelineHeaderTrailingWidth: CGFloat = 120
   @State var weeklyTrackedMinutes: Double = 0
   @State var cardsToReviewCount: Int = 0
+  @State var hasAnyTimelineReviewRating = false
+  @State var hasRecentTimelineReviewRating = false
   @State var showTimelineReview = false
   @State var reviewCountTask: Task<Void, Never>? = nil
   @State var reviewSummaryRefreshToken: Int = 0
@@ -80,6 +83,7 @@ struct MainView: View {
   @State var timelineFailureToastPayload: TimelineFailureToastPayload?
   @State var showScreenRecordingPermissionNotice = false
   @State var didDismissScreenRecordingPermissionNoticeThisSession = false
+  @Binding var goalFlowPresentation: DayGoalFlowPresentation?
 
   let rateSummaryFooterHeight: CGFloat = 28
   let weeklyHoursFadeDistance: CGFloat = 12
@@ -91,6 +95,10 @@ struct MainView: View {
     formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
     return formatter
   }()
+
+  init(goalFlowPresentation: Binding<DayGoalFlowPresentation?> = .constant(nil)) {
+    _goalFlowPresentation = goalFlowPresentation
+  }
 
   var body: some View {
     mainLayout
