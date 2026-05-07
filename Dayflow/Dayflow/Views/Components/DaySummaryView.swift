@@ -13,7 +13,9 @@ struct DaySummaryView: View {
   let storageManager: StorageManaging
   let cardsToReviewCount: Int
   let reviewRefreshToken: Int
+  let recordingControlMode: RecordingControlMode
   var onReviewTap: (() -> Void)? = nil
+  var onShowGoalFlow: ((DayGoalFlowPresentation) -> Void)? = nil
 
   @State private var timelineCards: [TimelineCard] = []
   @State private var isLoading = true
@@ -22,6 +24,8 @@ struct DaySummaryView: View {
   @State private var isEditingFocusCategories = false
   @State private var distractionCategoryIDs: Set<UUID> = []
   @State private var isEditingDistractionCategories = false
+  @State private var dayGoalPlan: DayGoalPlan?
+  @State private var yesterdayGoalReview: DayGoalReviewSnapshot?
 
   // MARK: - Pre-computed Stats (to avoid expensive parsing during body evaluation)
   // These are computed on background thread when data loads, avoiding main thread hangs
@@ -34,35 +38,20 @@ struct DaySummaryView: View {
   @State private var reviewSummary = TimelineReviewSummarySnapshot.placeholder
 
   private let showDistractionPattern = false
-  private let focusSelectionStorageKey = "focusCategorySelection"
-  private let distractionSelectionStorageKey = "distractionCategorySelection"
-
   private enum Design {
     static let contentWidth: CGFloat = 322
     static let horizontalPadding: CGFloat = 18
-    static let topPadding: CGFloat = 24
+    static let topPadding: CGFloat = 18
     static let bottomPadding: CGFloat = 48
     static let sectionSpacing: CGFloat = 26
-
+    static let targetsHeight: CGFloat = 213
     static let headerSpacing: CGFloat = 6
     static let donutSectionSpacing: CGFloat = 20
-    static let focusSectionSpacing: CGFloat = 12
-    static let focusCardsSpacing: CGFloat = 8
-    static let distractionsSpacing: CGFloat = 16
 
     static let dividerColor = Color(hex: "E7E5E3")
 
     static let titleColor = Color(hex: "333333")
     static let subtitleColor = Color(hex: "707070")
-
-    static let focusTitleColor = Color(hex: "333333")
-    static let focusValueColor = Color(hex: "F3854B")
-    static let focusCardBackground = Color(hex: "F7F7F7")
-    static let focusCardBorder = Color.white
-    static let focusIconColor = Color(hex: "CFC7BE")
-    static let focusEditButtonSize: CGFloat = 20
-    static let focusEditorWidth: CGFloat = contentWidth + (horizontalPadding * 2)
-    static let focusEditorOffsetY: CGFloat = 28
 
     static let focusGapMinutes: Int = 5
     static let timelineDayStartMinutes: Int = 4 * 60
@@ -83,6 +72,22 @@ struct DaySummaryView: View {
     let timelineDate = timelineDisplayDate(from: selectedDate)
     let info = timelineDate.getDayInfoFor4AMBoundary()
     return (info.dayString, info.startOfDay, info.endOfDay)
+  }
+
+  private var previousTimelineDayInfo: (dayString: String, startOfDay: Date, endOfDay: Date) {
+    let previousDate =
+      Calendar.current.date(byAdding: .day, value: -1, to: selectedDate)
+      ?? selectedDate
+    let timelineDate = timelineDisplayDate(from: previousDate)
+    let info = timelineDate.getDayInfoFor4AMBoundary()
+    return (info.dayString, info.startOfDay, info.endOfDay)
+  }
+
+  private var effectiveGoalPlan: DayGoalPlan {
+    if let dayGoalPlan {
+      return dayGoalPlan.carriedForward(to: timelineDayInfo.dayString, categories: categories)
+    }
+    return DayGoalPlan.defaultPlan(day: timelineDayInfo.dayString, categories: categories)
   }
 
   // MARK: - Cached Stats Accessors
@@ -125,40 +130,42 @@ struct DaySummaryView: View {
   // MARK: - Body
 
   var body: some View {
-    ScrollView {
-      VStack(alignment: .leading, spacing: Design.sectionSpacing) {
-        daySoFarSection
+    VStack(spacing: 0) {
+      todayTargetsSection
 
-        sectionDivider
+      ScrollView {
+        VStack(alignment: .leading, spacing: Design.sectionSpacing) {
+          daySoFarSection
 
-        reviewSection
+          sectionDivider
 
-        sectionDivider
+          reviewSection
 
-        focusSection
+          sectionDivider
 
-        sectionDivider
+          focusSection
 
-        distractionsSection
+          sectionDivider
+
+          distractionsSection
+        }
+        .frame(width: Design.contentWidth, alignment: .leading)
+        .padding(.top, Design.topPadding)
+        .padding(.bottom, Design.bottomPadding)
+        .padding(.horizontal, Design.horizontalPadding)
+        .onScrollStart(panelName: "day_summary") { direction in
+          AnalyticsService.shared.capture(
+            "right_panel_scrolled",
+            [
+              "panel": "day_summary",
+              "direction": direction,
+            ])
+        }
       }
-      .frame(width: Design.contentWidth, alignment: .leading)
-      .padding(.top, Design.topPadding)
-      .padding(.bottom, Design.bottomPadding)
-      .padding(.horizontal, Design.horizontalPadding)
-      .onScrollStart(panelName: "day_summary") { direction in
-        AnalyticsService.shared.capture(
-          "right_panel_scrolled",
-          [
-            "panel": "day_summary",
-            "direction": direction,
-          ])
-      }
+      .scrollIndicators(.never)
     }
-    .scrollIndicators(.never)
     .frame(maxWidth: .infinity, maxHeight: .infinity)
     .onAppear {
-      loadFocusSelectionIfNeeded()
-      loadDistractionSelectionIfNeeded()
       loadData()
     }
     .onChange(of: selectedDate) {
@@ -174,17 +181,7 @@ struct DaySummaryView: View {
       loadData()
     }
     .onChange(of: categories) {
-      syncFocusSelectionWithCategories()
-      syncDistractionSelectionWithCategories()
       recomputeCachedStatsForCategoryChange()
-    }
-    .onChange(of: focusCategoryIDs) {
-      persistFocusSelection()
-      recomputeFocusStats()
-    }
-    .onChange(of: distractionCategoryIDs) {
-      persistDistractionSelection()
-      recomputeDistractionStats()
     }
     .contentShape(Rectangle())
     .onTapGesture {
@@ -204,16 +201,20 @@ struct DaySummaryView: View {
 
     let dayInfo = timelineDayInfo
     let dayString = dayInfo.dayString
+    let previousDayInfo = previousTimelineDayInfo
     let storageManager = storageManager
 
     // Capture current state for background computation
-    let currentFocusIDs = focusCategoryIDs
-    let currentDistractionIDs = distractionCategoryIDs
     let currentCategories = categories
 
     Task.detached(priority: .userInitiated) {
       // Use timeline display date to handle 4 AM boundary
       let cards = storageManager.fetchTimelineCards(forDay: dayString)
+      let plan = Self.carriedForwardGoalPlan(
+        day: dayString,
+        storageManager: storageManager,
+        categories: currentCategories
+      )
       let summary = Self.makeReviewSummary(
         segments: storageManager.fetchReviewRatingSegments(
           overlapping: Int(dayInfo.startOfDay.timeIntervalSince1970),
@@ -232,15 +233,21 @@ struct DaySummaryView: View {
       let totalCaptured = self.computeTotalCapturedTime(
         from: precomputed, categories: currentCategories)
       let totalFocus = self.computeTotalFocusTime(
-        from: precomputed, focusIDs: currentFocusIDs, categories: currentCategories)
+        from: precomputed, snapshots: plan.focusCategories, categories: currentCategories)
       let blocks = self.computeFocusBlocks(
-        from: precomputed, focusIDs: currentFocusIDs, baseDate: dayInfo.startOfDay,
+        from: precomputed, snapshots: plan.focusCategories, baseDate: dayInfo.startOfDay,
         categories: currentCategories)
       let totalDistracted = self.computeTotalDistractedTime(
-        from: precomputed, distractionIDs: currentDistractionIDs, categories: currentCategories)
+        from: precomputed, snapshots: plan.distractionCategories, categories: currentCategories)
+      let yesterdayReview = self.makeGoalReviewSnapshot(
+        dayInfo: previousDayInfo,
+        storageManager: storageManager,
+        categories: currentCategories
+      )
 
       await MainActor.run {
         self.timelineCards = cards
+        self.applyGoalPlan(plan)
         self.cardsWithDurations = precomputed
         self.cachedCategoryDurations = catDurations
         self.cachedTotalCapturedTime = totalCaptured
@@ -250,6 +257,7 @@ struct DaySummaryView: View {
         self.isLoading = false
         self.hasCompletedInitialLoad = true
         self.reviewSummary = summary
+        self.yesterdayGoalReview = yesterdayReview
       }
     }
   }
@@ -273,6 +281,42 @@ struct DaySummaryView: View {
   }
 
   // MARK: - Header
+
+  private var todayTargetsSection: some View {
+    DayGoalHeader(
+      focusTargetDuration: effectiveGoalPlan.focusTargetDuration,
+      focusDuration: totalFocusTime,
+      focusCategories: targetFocusCategories,
+      distractionLimitDuration: effectiveGoalPlan.distractionLimitDuration,
+      distractedDuration: totalDistractedTime,
+      recordingControlMode: recordingControlMode,
+      onSetGoals: {
+        presentGoalFlow()
+      }
+    )
+    .frame(height: Design.targetsHeight)
+  }
+
+  private func presentGoalFlow() {
+    let review =
+      yesterdayGoalReview
+      ?? DayGoalReviewSnapshot.empty(
+        day: previousTimelineDayInfo.dayString,
+        plan: DayGoalPlan.defaultPlan(
+          day: previousTimelineDayInfo.dayString,
+          categories: categories
+        )
+      )
+
+    onShowGoalFlow?(
+      DayGoalFlowPresentation(
+        review: review,
+        plan: effectiveGoalPlan,
+        categories: selectableCategories,
+        onConfirm: saveGoalPlan
+      )
+    )
+  }
 
   private var daySoFarSection: some View {
     daySoFarContent
@@ -309,7 +353,7 @@ struct DaySummaryView: View {
         .frame(width: 140, height: 140)
 
       Text("No activity data yet")
-        .font(.custom("Nunito", size: 12))
+        .font(.custom("Figtree", size: 12))
         .foregroundColor(Color.gray.opacity(0.6))
     }
     .padding(.vertical, 20)
@@ -326,106 +370,44 @@ struct DaySummaryView: View {
   // MARK: - Focus Section
 
   private var focusSection: some View {
-    VStack(alignment: .leading, spacing: Design.focusSectionSpacing) {
-      HStack(alignment: .center, spacing: 6) {
-        Text("Your focus")
-          .font(.custom("InstrumentSerif-Regular", size: 22))
-          .foregroundColor(Design.focusTitleColor)
-
-        Image(systemName: "info.circle")
-          .font(.system(size: 12))
-          .foregroundColor(Design.focusIconColor)
-
-        Spacer()
-
-        CategoryEditCircleButton(
-          action: {
-            isEditingFocusCategories = true
-            isEditingDistractionCategories = false
-          },
-          diameter: Design.focusEditButtonSize
-        )
+    DayFocusSummarySection(
+      totalFocusText: formatDurationTitleCase(totalFocusTime),
+      focusBlocks: focusBlocks,
+      isSelectionEmpty: isFocusSelectionEmpty,
+      categories: selectableCategories,
+      selectedCategoryIDs: focusCategoryIDs,
+      isEditingCategories: isEditingFocusCategories,
+      onEditCategories: {
+        isEditingFocusCategories = true
+        isEditingDistractionCategories = false
+      },
+      onToggleCategory: toggleFocusCategory,
+      onDoneEditing: {
+        isEditingFocusCategories = false
       }
-
-      if isFocusSelectionEmpty {
-        Text("Edit categories to calculate focus.")
-          .font(.custom("Nunito", size: 11))
-          .foregroundColor(Design.subtitleColor)
-      }
-
-      VStack(spacing: Design.focusCardsSpacing) {
-        TotalFocusCard(value: formatDurationTitleCase(totalFocusTime))
-
-        LongestFocusCard(focusBlocks: focusBlocks)
-      }
-      .opacity(isFocusSelectionEmpty ? 0.45 : 1)
-    }
-    .overlay(alignment: .topLeading) {
-      if isEditingFocusCategories {
-        CategorySelectionEditor(
-          categories: selectableCategories,
-          selectedCategoryIDs: focusCategoryIDs,
-          helperText: "Pick the categories that count towards Focus",
-          onToggle: toggleFocusCategory,
-          onDone: { isEditingFocusCategories = false }
-        )
-        .frame(width: Design.focusEditorWidth, alignment: .leading)
-        .offset(y: Design.focusEditorOffsetY)
-        .offset(x: -Design.horizontalPadding)
-        .onTapGesture {}
-      }
-    }
+    )
   }
 
   private var distractionsSection: some View {
-    VStack(alignment: .leading, spacing: Design.distractionsSpacing) {
-      HStack(alignment: .center, spacing: 6) {
-        Text("Distractions so far")
-          .font(.custom("InstrumentSerif-Regular", size: 22))
-          .foregroundColor(Design.titleColor)
-
-        Spacer()
-
-        CategoryEditCircleButton(
-          action: {
-            isEditingDistractionCategories = true
-            isEditingFocusCategories = false
-          },
-          diameter: Design.focusEditButtonSize
-        )
+    DayDistractionSummarySection(
+      totalCapturedText: formatDurationLowercase(totalCapturedTime),
+      totalDistractedText: formatDurationLowercase(totalDistractedTime),
+      distractedRatio: distractedRatio,
+      patternTitle: showDistractionPattern ? (distractionPattern?.title ?? "") : "",
+      patternDescription: showDistractionPattern ? (distractionPattern?.description ?? "") : "",
+      isSelectionEmpty: isDistractionSelectionEmpty,
+      categories: selectableCategories,
+      selectedCategoryIDs: distractionCategoryIDs,
+      isEditingCategories: isEditingDistractionCategories,
+      onEditCategories: {
+        isEditingDistractionCategories = true
+        isEditingFocusCategories = false
+      },
+      onToggleCategory: toggleDistractionCategory,
+      onDoneEditing: {
+        isEditingDistractionCategories = false
       }
-
-      if isDistractionSelectionEmpty {
-        Text("Edit categories to calculate distractions.")
-          .font(.custom("Nunito", size: 11))
-          .foregroundColor(Design.subtitleColor)
-      }
-
-      DistractionSummaryCard(
-        totalCaptured: formatDurationLowercase(totalCapturedTime),
-        totalDistracted: formatDurationLowercase(totalDistractedTime),
-        distractedRatio: distractedRatio,
-        patternTitle: showDistractionPattern ? (distractionPattern?.title ?? "") : "",
-        patternDescription: showDistractionPattern ? (distractionPattern?.description ?? "") : ""
-      )
-      .frame(maxWidth: .infinity)
-      .opacity(isDistractionSelectionEmpty ? 0.45 : 1)
-    }
-    .overlay(alignment: .topLeading) {
-      if isEditingDistractionCategories {
-        CategorySelectionEditor(
-          categories: selectableCategories,
-          selectedCategoryIDs: distractionCategoryIDs,
-          helperText: "Pick the categories that count towards Distractions",
-          onToggle: toggleDistractionCategory,
-          onDone: { isEditingDistractionCategories = false }
-        )
-        .frame(width: Design.focusEditorWidth, alignment: .leading)
-        .offset(y: Design.focusEditorOffsetY)
-        .offset(x: -Design.horizontalPadding)
-        .onTapGesture {}
-      }
-    }
+    )
   }
 
   private var sectionDivider: some View {
@@ -442,39 +424,40 @@ struct DaySummaryView: View {
     return min(max(ratio, 0), 1)
   }
 
-  // MARK: - Helpers
+  private var targetFocusCategories: [TargetCategoryProgress] {
+    let durationByID = categoryDurations.reduce(into: [String: TimeInterval]()) { result, item in
+      result[item.id] = item.duration
+    }
+    let durationByName = categoryDurations.reduce(into: [String: TimeInterval]()) { result, item in
+      result[normalizedCategoryName(item.name)] = item.duration
+    }
 
-  private func isFocusCategory(_ category: String) -> Bool {
-    if isSystemCategory(category) { return false }
-    guard let categoryID = categoryID(for: category) else { return false }
-    return focusCategoryIDs.contains(categoryID)
+    return effectiveGoalPlan.focusCategories
+      .map(resolveSnapshot)
+      .sorted { $0.sortOrder < $1.sortOrder }
+      .prefix(4)
+      .map { snapshot in
+        TargetCategoryProgress(
+          id: snapshot.categoryID,
+          name: snapshot.name,
+          colorHex: snapshot.colorHex,
+          duration: durationByID[snapshot.categoryID]
+            ?? durationByName[normalizedCategoryName(snapshot.name), default: 0]
+        )
+      }
   }
+
+  // MARK: - Helpers
 
   nonisolated private func normalizedCategoryName(_ name: String) -> String {
     name.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
   }
 
-  private func isDistractionCategory(_ name: String) -> Bool {
-    if isSystemCategory(name) { return false }
-    guard let categoryID = categoryID(for: name) else { return false }
-    return distractionCategoryIDs.contains(categoryID)
-  }
-
-  private func isSystemCategory(_ name: String) -> Bool {
-    let normalized = normalizedCategoryName(name)
-    if normalized == "system" {
-      return true
-    }
-    guard let category = categories.first(where: { normalizedCategoryName($0.name) == normalized })
-    else {
-      return false
-    }
-    return category.isSystem
-  }
-
   private var selectableCategories: [TimelineCategory] {
     categories
-      .filter { $0.isSystem == false && normalizedCategoryName($0.name) != "system" }
+      .filter {
+        $0.isSystem == false && $0.isIdle == false && normalizedCategoryName($0.name) != "system"
+      }
       .sorted { $0.order < $1.order }
   }
 
@@ -486,106 +469,90 @@ struct DaySummaryView: View {
     distractionCategoryIDs.isEmpty
   }
 
-  private func categoryID(for name: String) -> UUID? {
-    let normalized = normalizedCategoryName(name)
-    return categories.first(where: { normalizedCategoryName($0.name) == normalized })?.id
-  }
-
   private func toggleFocusCategory(_ category: TimelineCategory) {
-    if focusCategoryIDs.contains(category.id) {
-      focusCategoryIDs.remove(category.id)
+    var plan = effectiveGoalPlan
+    let categoryID = category.id.uuidString
+    if plan.focusCategories.contains(where: { $0.categoryID == categoryID }) {
+      plan.focusCategories.removeAll { $0.categoryID == categoryID }
     } else {
-      focusCategoryIDs.insert(category.id)
+      plan.focusCategories.append(
+        DayGoalCategorySnapshot(category: category, sortOrder: plan.focusCategories.count)
+      )
     }
+    saveGoalPlan(normalizedPlan(plan))
   }
 
   private func toggleDistractionCategory(_ category: TimelineCategory) {
-    if distractionCategoryIDs.contains(category.id) {
-      distractionCategoryIDs.remove(category.id)
+    var plan = effectiveGoalPlan
+    let categoryID = category.id.uuidString
+    if plan.distractionCategories.contains(where: { $0.categoryID == categoryID }) {
+      plan.distractionCategories.removeAll { $0.categoryID == categoryID }
     } else {
-      distractionCategoryIDs.insert(category.id)
+      plan.distractionCategories.append(
+        DayGoalCategorySnapshot(category: category, sortOrder: plan.distractionCategories.count)
+      )
+    }
+    saveGoalPlan(normalizedPlan(plan))
+  }
+
+  private func applyGoalPlan(_ plan: DayGoalPlan) {
+    let resolved = plan.carriedForward(to: timelineDayInfo.dayString, categories: categories)
+    dayGoalPlan = resolved
+    focusCategoryIDs = Set(resolved.focusCategories.compactMap { UUID(uuidString: $0.categoryID) })
+    distractionCategoryIDs = Set(
+      resolved.distractionCategories.compactMap { UUID(uuidString: $0.categoryID) }
+    )
+  }
+
+  private func saveGoalPlan(_ plan: DayGoalPlan) {
+    let normalized = normalizedPlan(plan)
+    applyGoalPlan(normalized)
+    recomputeCachedStatsForCategoryChange()
+
+    let storageManager = storageManager
+    Task.detached(priority: .utility) {
+      storageManager.saveDayGoalPlan(normalized)
     }
   }
 
-  private func loadFocusSelectionIfNeeded() {
-    let defaults = UserDefaults.standard
-    let hasStoredSelection = defaults.object(forKey: focusSelectionStorageKey) != nil
-    let validIDs = Set(selectableCategories.map(\.id))
+  private func normalizedPlan(_ plan: DayGoalPlan) -> DayGoalPlan {
+    var copy = plan.carriedForward(to: timelineDayInfo.dayString, categories: selectableCategories)
+    copy.focusCategories = copy.focusCategories.enumerated().map { index, snapshot in
+      let resolved = resolveSnapshot(snapshot)
+      return DayGoalCategorySnapshot(
+        categoryID: resolved.categoryID,
+        name: resolved.name,
+        colorHex: resolved.colorHex,
+        sortOrder: index
+      )
+    }
+    copy.distractionCategories = copy.distractionCategories.enumerated().map { index, snapshot in
+      let resolved = resolveSnapshot(snapshot)
+      return DayGoalCategorySnapshot(
+        categoryID: resolved.categoryID,
+        name: resolved.name,
+        colorHex: resolved.colorHex,
+        sortOrder: index
+      )
+    }
+    return copy
+  }
 
-    if hasStoredSelection {
-      let stored = defaults.stringArray(forKey: focusSelectionStorageKey) ?? []
-      let parsed = Set(stored.compactMap { UUID(uuidString: $0) })
-      let sanitized = parsed.intersection(validIDs)
-      focusCategoryIDs = sanitized
-
-      if sanitized.count != parsed.count {
-        persistFocusSelection()
+  private func resolveSnapshot(_ snapshot: DayGoalCategorySnapshot) -> DayGoalCategorySnapshot {
+    let current =
+      selectableCategories.first(where: { $0.id.uuidString == snapshot.categoryID })
+      ?? selectableCategories.first {
+        normalizedCategoryName($0.name) == normalizedCategoryName(snapshot.name)
       }
-      return
+    guard let current else {
+      return snapshot
     }
-
-    if let workCategory = selectableCategories.first(where: {
-      normalizedCategoryName($0.name) == "work"
-    }) {
-      focusCategoryIDs = [workCategory.id]
-    } else {
-      focusCategoryIDs = []
-    }
-    persistFocusSelection()
-  }
-
-  private func syncFocusSelectionWithCategories() {
-    let validIDs = Set(selectableCategories.map(\.id))
-    let updated = focusCategoryIDs.intersection(validIDs)
-    if updated != focusCategoryIDs {
-      focusCategoryIDs = updated
-    }
-  }
-
-  private func persistFocusSelection() {
-    let stored = focusCategoryIDs.map { $0.uuidString }
-    UserDefaults.standard.set(stored, forKey: focusSelectionStorageKey)
-  }
-
-  private func loadDistractionSelectionIfNeeded() {
-    let defaults = UserDefaults.standard
-    let hasStoredSelection = defaults.object(forKey: distractionSelectionStorageKey) != nil
-    let validIDs = Set(selectableCategories.map(\.id))
-
-    if hasStoredSelection {
-      let stored = defaults.stringArray(forKey: distractionSelectionStorageKey) ?? []
-      let parsed = Set(stored.compactMap { UUID(uuidString: $0) })
-      let sanitized = parsed.intersection(validIDs)
-      distractionCategoryIDs = sanitized
-
-      if sanitized.count != parsed.count {
-        persistDistractionSelection()
-      }
-      return
-    }
-
-    if let distractionCategory = selectableCategories.first(where: {
-      let normalized = normalizedCategoryName($0.name)
-      return normalized == "distraction" || normalized == "distractions"
-    }) {
-      distractionCategoryIDs = [distractionCategory.id]
-    } else {
-      distractionCategoryIDs = []
-    }
-    persistDistractionSelection()
-  }
-
-  private func syncDistractionSelectionWithCategories() {
-    let validIDs = Set(selectableCategories.map(\.id))
-    let updated = distractionCategoryIDs.intersection(validIDs)
-    if updated != distractionCategoryIDs {
-      distractionCategoryIDs = updated
-    }
-  }
-
-  private func persistDistractionSelection() {
-    let stored = distractionCategoryIDs.map { $0.uuidString }
-    UserDefaults.standard.set(stored, forKey: distractionSelectionStorageKey)
+    return DayGoalCategorySnapshot(
+      categoryID: current.id.uuidString,
+      name: current.name,
+      colorHex: current.colorHex,
+      sortOrder: snapshot.sortOrder
+    )
   }
 
   nonisolated private func timelineMinutes(for timeString: String) -> Int? {
@@ -776,23 +743,24 @@ struct DaySummaryView: View {
 
   /// Computes total focus time from pre-computed data
   nonisolated private func computeTotalFocusTime(
-    from precomputed: [CardWithDuration], focusIDs: Set<UUID>, categories: [TimelineCategory]
+    from precomputed: [CardWithDuration], snapshots: [DayGoalCategorySnapshot],
+    categories: [TimelineCategory]
   ) -> TimeInterval {
     normalizedNonSystemDurations(from: precomputed, categories: categories)
       .filter {
-        isFocusCategoryStatic($0.card.category, focusIDs: focusIDs, categories: categories)
+        isGoalCategoryStatic($0.card.category, snapshots: snapshots, categories: categories)
       }
       .reduce(0) { $0 + $1.duration }
   }
 
   /// Computes focus blocks from pre-computed data
   nonisolated private func computeFocusBlocks(
-    from precomputed: [CardWithDuration], focusIDs: Set<UUID>, baseDate: Date,
+    from precomputed: [CardWithDuration], snapshots: [DayGoalCategorySnapshot], baseDate: Date,
     categories: [TimelineCategory]
   ) -> [FocusBlock] {
     let focusCards = normalizedNonSystemDurations(from: precomputed, categories: categories)
       .filter {
-        isFocusCategoryStatic($0.card.category, focusIDs: focusIDs, categories: categories)
+        isGoalCategoryStatic($0.card.category, snapshots: snapshots, categories: categories)
       }
 
     var blocks: [(start: Int, end: Int)] = []
@@ -822,13 +790,13 @@ struct DaySummaryView: View {
 
   /// Computes total distracted time from pre-computed data
   nonisolated private func computeTotalDistractedTime(
-    from precomputed: [CardWithDuration], distractionIDs: Set<UUID>, categories: [TimelineCategory]
+    from precomputed: [CardWithDuration], snapshots: [DayGoalCategorySnapshot],
+    categories: [TimelineCategory]
   ) -> TimeInterval {
     normalizedNonSystemDurations(from: precomputed, categories: categories).reduce(0) {
       total, item in
       guard
-        isDistractionCategoryStatic(
-          item.card.category, distractionIDs: distractionIDs, categories: categories)
+        isGoalCategoryStatic(item.card.category, snapshots: snapshots, categories: categories)
       else { return total }
       return total + item.duration
     }
@@ -847,46 +815,21 @@ struct DaySummaryView: View {
     return category.isSystem
   }
 
-  /// Static version of isFocusCategory (for use in background thread)
-  nonisolated private func isFocusCategoryStatic(
-    _ category: String, focusIDs: Set<UUID>, categories: [TimelineCategory]
-  ) -> Bool {
-    if isSystemCategoryStatic(category, categories: categories) { return false }
-    let normalized = normalizedCategoryName(category)
-    guard let cat = categories.first(where: { normalizedCategoryName($0.name) == normalized })
-    else { return false }
-    return focusIDs.contains(cat.id)
-  }
-
-  /// Static version of isDistractionCategory (for use in background thread)
-  nonisolated private func isDistractionCategoryStatic(
-    _ name: String, distractionIDs: Set<UUID>, categories: [TimelineCategory]
+  /// Goal-category matcher that prefers current category IDs and falls back to saved names.
+  nonisolated private func isGoalCategoryStatic(
+    _ name: String, snapshots: [DayGoalCategorySnapshot], categories: [TimelineCategory]
   ) -> Bool {
     if isSystemCategoryStatic(name, categories: categories) { return false }
     let normalized = normalizedCategoryName(name)
-    guard let cat = categories.first(where: { normalizedCategoryName($0.name) == normalized })
-    else { return false }
-    return distractionIDs.contains(cat.id)
-  }
+    let selectedIDs = Set(snapshots.map(\.categoryID))
 
-  /// Recomputes focus-related stats when focusCategoryIDs changes
-  private func recomputeFocusStats() {
-    let precomputed = cardsWithDurations
-    let focusIDs = focusCategoryIDs
-    let currentCategories = categories
-    let baseDate = timelineDayInfo.startOfDay
-
-    Task.detached(priority: .userInitiated) {
-      let totalFocus = self.computeTotalFocusTime(
-        from: precomputed, focusIDs: focusIDs, categories: currentCategories)
-      let blocks = self.computeFocusBlocks(
-        from: precomputed, focusIDs: focusIDs, baseDate: baseDate, categories: currentCategories)
-
-      await MainActor.run {
-        self.cachedTotalFocusTime = totalFocus
-        self.cachedFocusBlocks = blocks
-      }
+    if let category = categories.first(where: { normalizedCategoryName($0.name) == normalized }),
+      selectedIDs.contains(category.id.uuidString)
+    {
+      return true
     }
+
+    return snapshots.contains { normalizedCategoryName($0.name) == normalized }
   }
 
   /// Recomputes cached stats when categories change (rename/color/system/focus/distraction flags)
@@ -894,8 +837,7 @@ struct DaySummaryView: View {
     let precomputed =
       cardsWithDurations.isEmpty ? precomputeCardDurations(timelineCards) : cardsWithDurations
     let currentCategories = categories
-    let focusIDs = focusCategoryIDs
-    let distractionIDs = distractionCategoryIDs
+    let plan = effectiveGoalPlan
     let baseDate = timelineDayInfo.startOfDay
 
     Task.detached(priority: .userInitiated) {
@@ -904,11 +846,12 @@ struct DaySummaryView: View {
       let totalCaptured = self.computeTotalCapturedTime(
         from: precomputed, categories: currentCategories)
       let totalFocus = self.computeTotalFocusTime(
-        from: precomputed, focusIDs: focusIDs, categories: currentCategories)
+        from: precomputed, snapshots: plan.focusCategories, categories: currentCategories)
       let blocks = self.computeFocusBlocks(
-        from: precomputed, focusIDs: focusIDs, baseDate: baseDate, categories: currentCategories)
+        from: precomputed, snapshots: plan.focusCategories, baseDate: baseDate,
+        categories: currentCategories)
       let totalDistracted = self.computeTotalDistractedTime(
-        from: precomputed, distractionIDs: distractionIDs, categories: currentCategories)
+        from: precomputed, snapshots: plan.distractionCategories, categories: currentCategories)
 
       await MainActor.run {
         self.cachedCategoryDurations = catDurations
@@ -920,20 +863,84 @@ struct DaySummaryView: View {
     }
   }
 
-  /// Recomputes distraction-related stats when distractionCategoryIDs changes
-  private func recomputeDistractionStats() {
-    let precomputed = cardsWithDurations
-    let distractionIDs = distractionCategoryIDs
-    let currentCategories = categories
+  nonisolated private func makeGoalReviewSnapshot(
+    dayInfo: (dayString: String, startOfDay: Date, endOfDay: Date),
+    storageManager: StorageManaging,
+    categories: [TimelineCategory]
+  ) -> DayGoalReviewSnapshot {
+    let plan = Self.carriedForwardGoalPlan(
+      day: dayInfo.dayString,
+      storageManager: storageManager,
+      categories: categories
+    )
+    let cards = storageManager.fetchTimelineCards(forDay: dayInfo.dayString)
+    let precomputed = precomputeCardDurations(cards)
+    let categoryDurations = computeCategoryDurations(from: precomputed, categories: categories)
+    let focusDuration = computeTotalFocusTime(
+      from: precomputed,
+      snapshots: plan.focusCategories,
+      categories: categories
+    )
+    let distractedDuration = computeTotalDistractedTime(
+      from: precomputed,
+      snapshots: plan.distractionCategories,
+      categories: categories
+    )
 
-    Task.detached(priority: .userInitiated) {
-      let totalDistracted = self.computeTotalDistractedTime(
-        from: precomputed, distractionIDs: distractionIDs, categories: currentCategories)
+    return DayGoalReviewSnapshot(
+      day: dayInfo.dayString,
+      plan: plan,
+      focusDuration: focusDuration,
+      distractedDuration: distractedDuration,
+      focusCategories: goalCategoryResults(
+        snapshots: plan.focusCategories,
+        categoryDurations: categoryDurations,
+        categories: categories
+      )
+    )
+  }
 
-      await MainActor.run {
-        self.cachedTotalDistractedTime = totalDistracted
-      }
+  nonisolated private static func carriedForwardGoalPlan(
+    day: String,
+    storageManager: StorageManaging,
+    categories: [TimelineCategory]
+  ) -> DayGoalPlan {
+    let saved = storageManager.fetchMostRecentDayGoalPlan(beforeOrOn: day)
+    let plan = saved ?? DayGoalPlan.defaultPlan(day: day, categories: categories)
+    return plan.carriedForward(to: day, categories: categories)
+  }
+
+  nonisolated private func goalCategoryResults(
+    snapshots: [DayGoalCategorySnapshot],
+    categoryDurations: [CategoryTimeData],
+    categories: [TimelineCategory]
+  ) -> [DayGoalCategoryResult] {
+    let currentByID = Dictionary(uniqueKeysWithValues: categories.map { ($0.id.uuidString, $0) })
+    let durationByID = categoryDurations.reduce(into: [String: TimeInterval]()) { result, item in
+      result[item.id] = item.duration
     }
+    let durationByName = categoryDurations.reduce(into: [String: TimeInterval]()) { result, item in
+      result[normalizedCategoryName(item.name)] = item.duration
+    }
+
+    return
+      snapshots
+      .sorted { $0.sortOrder < $1.sortOrder }
+      .map { snapshot in
+        let current = currentByID[snapshot.categoryID]
+        let name = current?.name ?? snapshot.name
+        let colorHex = current?.colorHex ?? snapshot.colorHex
+        let duration =
+          durationByID[snapshot.categoryID]
+          ?? durationByName[normalizedCategoryName(snapshot.name), default: 0]
+
+        return DayGoalCategoryResult(
+          id: snapshot.categoryID,
+          name: name,
+          colorHex: colorHex,
+          duration: duration
+        )
+      }
   }
 
   private enum ReviewRatingKey: String {
@@ -991,280 +998,14 @@ struct DaySummaryView: View {
   }
 }
 
-private struct TotalFocusCard: View {
-  let value: String
-
-  var body: some View {
-    VStack(alignment: .leading, spacing: 4) {
-      HStack(spacing: 6) {
-        Text("Total focus time")
-          .font(.custom("InstrumentSerif-Regular", size: 16))
-          .foregroundColor(Color(hex: "333333"))
-
-        Image(systemName: "info.circle")
-          .font(.system(size: 12))
-          .foregroundColor(Color(hex: "CFC7BE"))
-
-        Spacer()
-      }
-
-      Text(value)
-        .font(.custom("InstrumentSerif-Regular", size: 34))
-        .foregroundColor(Color(hex: "F3854B"))
-        .frame(maxWidth: .infinity, alignment: .leading)
-    }
-    .padding(.horizontal, 16)
-    .padding(.vertical, 12)
-    .frame(maxWidth: .infinity, alignment: .leading)
-    .background(Color(hex: "F7F7F7"))
-    .overlay(
-      RoundedRectangle(cornerRadius: 8)
-        .stroke(Color.white, lineWidth: 1)
-    )
-    .clipShape(RoundedRectangle(cornerRadius: 8))
-  }
-}
-
-struct ConfettiBurstView: View {
-  let trigger: Int
-
-  private let colors: [Color] = [
-    Color(hex: "FF6B6B"),
-    Color(hex: "FFD93D"),
-    Color(hex: "6BCB77"),
-    Color(hex: "4D96FF"),
-    Color(hex: "9B5DE5"),
-    Color(hex: "FF8FAB"),
-    Color(hex: "00C2FF"),
-    Color(hex: "FFA41B"),
-    Color(hex: "F72585"),
-    Color(hex: "7AE582"),
-  ]
-  private let confettiCount = 60
-
-  var body: some View {
-    ZStack {
-      ForEach(0..<confettiCount, id: \.self) { index in
-        ConfettiPiece(
-          color: colors[index % colors.count],
-          trigger: trigger
-        )
-      }
-    }
-    .allowsHitTesting(false)
-  }
-}
-
-private struct ConfettiPiece: View {
-  let color: Color
-  let trigger: Int
-  @State private var offset: CGSize = .zero
-  @State private var rotation: Double = 0
-  @State private var opacity: Double = 0
-
-  var body: some View {
-    RoundedRectangle(cornerRadius: 2)
-      .fill(color)
-      .frame(width: 6, height: 10)
-      .rotationEffect(.degrees(rotation))
-      .offset(offset)
-      .opacity(opacity)
-      .onChange(of: trigger) {
-        let xStart = Double.random(in: -60...60)
-        let xBurst = Double.random(in: -220...220)
-        let xFall = Double.random(in: -340...340)
-        let yBurst = Double.random(in: -30...50)
-        let yFall = Double.random(in: 200...360)
-        let spinBurst = Double.random(in: -120...120)
-        let spinFall = spinBurst + Double.random(in: -240...240)
-
-        offset = CGSize(width: xStart, height: -6)
-        rotation = 0
-        opacity = 1
-
-        withAnimation(.spring(response: 0.4, dampingFraction: 0.65)) {
-          offset = CGSize(width: xBurst, height: yBurst)
-          rotation = spinBurst
-        }
-
-        withAnimation(.easeInOut(duration: 1.6).delay(0.3)) {
-          offset = CGSize(width: xFall, height: yFall)
-          rotation = spinFall
-        }
-
-        withAnimation(.easeOut(duration: 0.4).delay(1.6)) {
-          opacity = 0
-        }
-      }
-  }
-}
-
-private struct CategorySelectionEditor: View {
-  let categories: [TimelineCategory]
-  let selectedCategoryIDs: Set<UUID>
-  let helperText: String
-  var onToggle: (TimelineCategory) -> Void
-  var onDone: () -> Void
-
-  private enum Design {
-    static let pillSpacing: CGFloat = 4
-    static let rowSpacing: CGFloat = 4
-    static let horizontalPadding: CGFloat = 10
-    static let verticalPadding: CGFloat = 10
-    static let dividerColor = Color(red: 0.91, green: 0.89, blue: 0.86)
-    static let helperTextColor = Color(hex: "6C6761")
-    static let helperTextSize: CGFloat = 11
-    static let backgroundColor = Color(red: 0.98, green: 0.96, blue: 0.95).opacity(0.86)
-    static let borderColor = Color(red: 0.91, green: 0.88, blue: 0.87)
-    static let cornerRadius: CGFloat = 6
-  }
-
-  var body: some View {
-    VStack(spacing: 12) {
-      FocusCategoryFlowLayout(spacing: Design.pillSpacing, rowSpacing: Design.rowSpacing) {
-        ForEach(categories) { category in
-          CategoryPill(
-            category: category,
-            isSelected: selectedCategoryIDs.contains(category.id)
-          ) {
-            onToggle(category)
-          }
-        }
-      }
-      .frame(maxWidth: .infinity, alignment: .leading)
-
-      Rectangle()
-        .fill(Design.dividerColor)
-        .frame(height: 1)
-
-      helperRow
-        .frame(maxWidth: .infinity, alignment: .leading)
-    }
-    .padding(.horizontal, Design.horizontalPadding)
-    .padding(.vertical, Design.verticalPadding)
-    .frame(maxWidth: .infinity, alignment: .leading)
-    .background(backgroundView)
-    .clipShape(RoundedRectangle(cornerRadius: Design.cornerRadius))
-    .overlay(
-      RoundedRectangle(cornerRadius: Design.cornerRadius)
-        .stroke(Design.borderColor, lineWidth: 1)
-    )
-    .overlay(alignment: .topTrailing) {
-      Button(action: onDone) {
-        Image(systemName: "checkmark")
-          .font(.system(size: 8))
-          .foregroundColor(Color(red: 0.2, green: 0.2, blue: 0.2))
-          .frame(width: 8, height: 8)
-      }
-      .buttonStyle(.plain)
-      .hoverScaleEffect(scale: 1.02)
-      .pointingHandCursorOnHover(reassertOnPressEnd: true)
-      .padding(6)
-      .background(
-        Color(red: 0.98, green: 0.98, blue: 0.98).opacity(0.8)
-          .background(.ultraThinMaterial)
-      )
-      .clipShape(
-        RoundedRectangle(cornerRadius: Design.cornerRadius)
-      )
-      .overlay(
-        RoundedRectangle(cornerRadius: Design.cornerRadius)
-          .stroke(Color(red: 0.89, green: 0.89, blue: 0.89), lineWidth: 1)
-      )
-      .offset(x: -8, y: 8)
-    }
-    .shadow(color: Color.black.opacity(0.08), radius: 18, x: 0, y: 10)
-  }
-
-  private var helperRow: some View {
-    HStack(alignment: .center, spacing: 6) {
-      Image(systemName: "lightbulb")
-        .font(.system(size: 11))
-        .foregroundColor(Design.helperTextColor.opacity(0.7))
-
-      Text(helperText)
-        .font(.custom("Nunito", size: Design.helperTextSize))
-        .foregroundColor(Design.helperTextColor)
-    }
-  }
-
-  private var backgroundView: some View {
-    Design.backgroundColor
-      .background(.ultraThinMaterial)
-  }
-}
-
-private struct FocusCategoryFlowLayout: Layout {
-  var spacing: CGFloat = 4
-  var rowSpacing: CGFloat = 4
-
-  func makeCache(subviews: Subviews) {
-    ()
-  }
-
-  func updateCache(_ cache: inout (), subviews: Subviews) {}
-
-  func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
-    let maxWidth = proposal.width ?? .infinity
-    var rowWidth: CGFloat = 0
-    var rowHeight: CGFloat = 0
-    var totalHeight: CGFloat = 0
-    var maxRowWidth: CGFloat = 0
-
-    for subview in subviews {
-      let size = subview.sizeThatFits(.unspecified)
-      let proposedWidth = size.width
-
-      if rowWidth > 0 && rowWidth + spacing + proposedWidth > maxWidth {
-        totalHeight += rowHeight + rowSpacing
-        maxRowWidth = max(maxRowWidth, rowWidth)
-        rowWidth = proposedWidth
-        rowHeight = size.height
-      } else {
-        rowWidth = rowWidth == 0 ? proposedWidth : rowWidth + spacing + proposedWidth
-        rowHeight = max(rowHeight, size.height)
-      }
-    }
-
-    maxRowWidth = max(maxRowWidth, rowWidth)
-    totalHeight += rowHeight
-
-    return CGSize(width: maxRowWidth, height: totalHeight)
-  }
-
-  func placeSubviews(
-    in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()
-  ) {
-    var origin = CGPoint(x: bounds.minX, y: bounds.minY)
-    var currentRowHeight: CGFloat = 0
-
-    for subview in subviews {
-      let size = subview.sizeThatFits(.unspecified)
-      if origin.x > bounds.minX && origin.x + size.width > bounds.maxX {
-        origin.x = bounds.minX
-        origin.y += currentRowHeight + rowSpacing
-        currentRowHeight = 0
-      }
-
-      subview.place(
-        at: CGPoint(x: origin.x, y: origin.y),
-        proposal: ProposedViewSize(width: size.width, height: size.height)
-      )
-
-      origin.x += size.width + spacing
-      currentRowHeight = max(currentRowHeight, size.height)
-    }
-  }
-}
-
-// MARK: - Preview
-
 #Preview("Day Summary") {
   let sampleCategories: [TimelineCategory] = [
-    TimelineCategory(name: "Work", colorHex: "#B984FF", order: 0),
-    TimelineCategory(name: "Personal", colorHex: "#6AADFF", order: 1),
-    TimelineCategory(name: "Distraction", colorHex: "#FF5950", order: 2),
-    TimelineCategory(name: "Idle", colorHex: "#A0AEC0", order: 3, isSystem: true, isIdle: true),
+    TimelineCategory(name: "Research", colorHex: "#8BAAFF", order: 0),
+    TimelineCategory(name: "Coding", colorHex: "#CF8FFF", order: 1),
+    TimelineCategory(name: "Code review", colorHex: "#90DDF0", order: 2),
+    TimelineCategory(name: "Debugging", colorHex: "#6E66D4", order: 3),
+    TimelineCategory(name: "Distraction", colorHex: "#FF5950", order: 4),
+    TimelineCategory(name: "Idle", colorHex: "#A0AEC0", order: 5, isSystem: true, isIdle: true),
   ]
 
   DaySummaryView(
@@ -1273,6 +1014,7 @@ private struct FocusCategoryFlowLayout: Layout {
     storageManager: StorageManager.shared,
     cardsToReviewCount: 3,
     reviewRefreshToken: 0,
+    recordingControlMode: .active,
     onReviewTap: {}
   )
   .frame(width: 358, height: 700)
