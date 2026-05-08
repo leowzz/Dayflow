@@ -12,27 +12,34 @@ struct TabFilterBar: View {
 
   var body: some View {
     GeometryReader { geometry in
-      let availableWidth = geometry.size.width
-      let inlineContentLimit = max(0, availableWidth - (editButtonSize + chipButtonSpacing))
-      let fitsInline = chipRowWidth == 0 ? true : chipRowWidth <= inlineContentLimit
+      let availableWidth = max(0, geometry.size.width)
+      let maxChipRowWidth = max(0, availableWidth - editButtonSize - chipButtonSpacing)
+      let hasMeasuredChipRow = chipRowWidth > 0
+      let isOverflowing = hasMeasuredChipRow && chipRowWidth > maxChipRowWidth
+      let chipRowFrameWidth =
+        hasMeasuredChipRow
+        ? min(chipRowWidth, maxChipRowWidth)
+        : maxChipRowWidth
 
-      Group {
-        if fitsInline {
-          HStack(spacing: chipButtonSpacing) {
-            scrollableChipRow(maxWidth: chipRowWidth == 0 ? inlineContentLimit : chipRowWidth)
-            editButton
-          }
-        } else {
-          ZStack(alignment: .trailing) {
-            scrollableChipRow(maxWidth: nil)
-              .padding(.trailing, editButtonSize + chipButtonSpacing)
-
+      ZStack(alignment: .topLeading) {
+        HStack(spacing: chipButtonSpacing) {
+          visibleChipRow(width: chipRowFrameWidth)
+          editButton
+        }
+        .frame(width: availableWidth, height: editButtonSize, alignment: .leading)
+        .overlay(alignment: .trailing) {
+          if isOverflowing {
             overflowGradient
-            editButton
+              .padding(.trailing, editButtonSize + chipButtonSpacing)
           }
         }
+
+        measuredChipRow
+          .opacity(0)
+          .allowsHitTesting(false)
+          .accessibilityHidden(true)
       }
-      .frame(width: geometry.size.width, height: editButtonSize, alignment: .leading)
+      .frame(width: availableWidth, height: editButtonSize, alignment: .leading)
     }
     .frame(height: editButtonSize)
     .onPreferenceChange(ChipRowWidthPreferenceKey.self) { chipRowWidth = $0 }
@@ -50,7 +57,7 @@ struct TabFilterBar: View {
 
         Text(category.name)
           .font(
-            Font.custom("Nunito", size: 13)
+            Font.custom("Figtree", size: 13)
               .weight(.medium)
           )
           .foregroundColor(Color(red: 0.2, green: 0.2, blue: 0.2))
@@ -70,23 +77,27 @@ struct TabFilterBar: View {
     }
   }
 
-  private func scrollableChipRow(maxWidth: CGFloat?) -> some View {
-    let row = ScrollView(.horizontal, showsIndicators: false) {
-      measuredChipRow
+  private func visibleChipRow(width: CGFloat) -> some View {
+    ScrollView(.horizontal, showsIndicators: false) {
+      chipRowContent
+        .fixedSize(horizontal: true, vertical: false)
+        .frame(height: 26)
     }
-    .frame(height: 26)
+    .frame(width: max(0, width), height: 26, alignment: .leading)
     .clipped()
-
-    return Group {
-      if let maxWidth {
-        row.frame(width: max(0, maxWidth), alignment: .leading)
-      } else {
-        row
-      }
-    }
   }
 
   private var measuredChipRow: some View {
+    chipRowContent
+      .fixedSize(horizontal: true, vertical: false)
+      .background(
+        GeometryReader { proxy in
+          Color.clear.preference(key: ChipRowWidthPreferenceKey.self, value: proxy.size.width)
+        }
+      )
+  }
+
+  private var chipRowContent: some View {
     HStack(spacing: 5) {
       ForEach(categories) { category in
         CategoryChip(category: category, isIdle: false)
@@ -97,11 +108,6 @@ struct TabFilterBar: View {
       }
     }
     .padding(.leading, 1)
-    .background(
-      GeometryReader { proxy in
-        Color.clear.preference(key: ChipRowWidthPreferenceKey.self, value: proxy.size.width)
-      }
-    )
   }
 
   private var editButton: some View {
@@ -112,20 +118,13 @@ struct TabFilterBar: View {
   }
 
   private var overflowGradient: some View {
-    HStack(spacing: 0) {
-      Spacer()
-      LinearGradient(
-        gradient: Gradient(colors: [Color.clear, Color(hex: "FFF8F1")]),
-        startPoint: .leading,
-        endPoint: .trailing
-      )
-      .frame(width: 40)
-      .allowsHitTesting(false)
-
-      Color(hex: "FFF8F1")
-        .frame(width: editButtonSize)
-        .allowsHitTesting(false)
-    }
+    LinearGradient(
+      gradient: Gradient(colors: [Color.clear, Color(hex: "FFF8F1")]),
+      startPoint: .leading,
+      endPoint: .trailing
+    )
+    .frame(width: 40)
+    .allowsHitTesting(false)
   }
 
   private struct ChipRowWidthPreferenceKey: PreferenceKey {
