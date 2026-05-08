@@ -153,7 +153,7 @@ struct SidebarIconButton: View {
         .frame(width: SidebarMetrics.iconContainerSize, height: SidebarMetrics.iconContainerSize)
 
         Text(icon.displayName)
-          .font(.custom("Nunito", size: SidebarMetrics.labelFontSize))
+          .font(.custom("Figtree", size: SidebarMetrics.labelFontSize))
           .lineLimit(1)
           .minimumScaleFactor(0.75)
           .foregroundColor(

@@ -52,6 +52,69 @@ private struct TimelineHeaderVisibility {
   var showInlineDate: Bool
 }
 
+enum TimelineAlignment {
+  static let topInset: CGFloat = 24
+  static let pickerRowOffset: CGFloat = -10
+  static let categoryRowInset: CGFloat = 55
+  static let headerContentGap: CGFloat = 18
+}
+
+enum TimelineNavigationLayout {
+  static let arrowSize: CGFloat = 24
+  static let hoverCircleSize: CGFloat = 30
+  static let calendarGap: CGFloat = 4
+}
+
+enum LogoPosition {
+  static let logoSize: CGFloat = 48
+  static let logoVerticalOffset: CGFloat = 8
+}
+
+private struct TimelineNavigationButton: View {
+  let assetName: String
+  var isEnabled = true
+  var arrowSize: CGFloat = TimelineNavigationLayout.arrowSize
+  var hoverCircleSize: CGFloat = TimelineNavigationLayout.hoverCircleSize
+  let action: () -> Void
+
+  @State private var isHovering = false
+
+  var body: some View {
+    Button(action: {
+      guard isEnabled else { return }
+      action()
+    }) {
+      ZStack {
+        Circle()
+          .fill(Color(hex: "FFEBD3").opacity(0.79))
+          .frame(width: hoverCircleSize, height: hoverCircleSize)
+          .opacity(isHovering && isEnabled ? 1 : 0)
+
+        Image(assetName)
+          .resizable()
+          .scaledToFit()
+          .frame(width: arrowSize, height: arrowSize)
+          .opacity(isEnabled ? 1 : 0.35)
+      }
+      .frame(width: max(arrowSize, hoverCircleSize), height: max(arrowSize, hoverCircleSize))
+      .contentShape(Circle())
+    }
+    .buttonStyle(DayflowPressScaleButtonStyle(enabled: isEnabled))
+    .disabled(!isEnabled)
+    .onHover { hovering in
+      withAnimation(.easeOut(duration: 0.12)) {
+        isHovering = isEnabled && hovering
+      }
+    }
+    .onChange(of: isEnabled) { _, enabled in
+      if !enabled {
+        isHovering = false
+      }
+    }
+    .pointingHandCursorOnHover(enabled: isEnabled, reassertOnPressEnd: true)
+  }
+}
+
 extension MainView {
   // `mainLayout` is split into two chained computed properties because the
   // full modifier stack (20+ modifiers, several large inline closures) was
@@ -74,6 +137,8 @@ extension MainView {
       .frame(maxWidth: .infinity, maxHeight: .infinity)
       .background(Color.clear)
       .ignoresSafeArea()
+      .blur(radius: goalFlowPresentation == nil ? 0 : 10)
+      .allowsHitTesting(goalFlowPresentation == nil)
       // Hero animation overlay for video expansion (Emil Kowalski: shared element transitions)
       .overlay { overlayContent }
       .overlay(alignment: .bottomTrailing) { timelineFailureToastOverlayContent }
@@ -433,9 +498,10 @@ extension MainView {
     // Left column: Logo on top, sidebar centered
     VStack(spacing: 0) {
       // Logo area (keeps same animation)
-      LogoBadgeView(imageName: "DayflowLogoMainApp", size: 36)
+      LogoBadgeView(imageName: "DayflowLogoMainApp", size: LogoPosition.logoSize)
         .frame(height: 100)
         .frame(maxWidth: .infinity)
+        .offset(y: LogoPosition.logoVerticalOffset)
         .scaleEffect(logoScale)
         .opacity(logoOpacity)
 
@@ -505,33 +571,38 @@ extension MainView {
   }
 
   private func timelinePanel(geo: GeometryProxy) -> some View {
-    HStack(alignment: .top, spacing: 0) {
-      timelineLeftColumn
-        .zIndex(1)
-      Rectangle()
-        .fill(Color(hex: "ECECEC"))
-        .frame(width: timelineInspectorDividerWidth)
-        .opacity(timelineInspectorDividerWidth == 0 ? 0 : 1)
-        .frame(maxHeight: .infinity)
-      timelineRightColumn(geo: geo)
+    ZStack(alignment: .topLeading) {
+      HStack(alignment: .top, spacing: 0) {
+        timelineLeftColumn
+          .zIndex(1)
+        Rectangle()
+          .fill(Color(hex: "ECECEC"))
+          .frame(width: timelineInspectorDividerWidth)
+          .opacity(timelineInspectorDividerWidth == 0 ? 0 : 1)
+          .frame(maxHeight: .infinity)
+        timelineRightColumn(geo: geo)
+      }
     }
     .frame(width: geo.size.width, height: geo.size.height, alignment: .topLeading)
     .coordinateSpace(name: "TimelinePanel")
     .overlay(alignment: .topLeading) {
-      timelineCalendarPopoverOverlay(panelWidth: geo.size.width)
+      if goalFlowPresentation == nil {
+        timelineCalendarPopoverOverlay(panelWidth: geo.size.width)
+      }
     }
+    .animation(.spring(response: 0.32, dampingFraction: 0.9), value: goalFlowPresentation?.id)
     .onPreferenceChange(TimelineCalendarButtonFramePreferenceKey.self) { frame in
       timelineCalendarButtonFrame = frame
     }
   }
 
   private var timelineLeftColumn: some View {
-    VStack(alignment: .leading, spacing: 18) {
+    VStack(alignment: .leading, spacing: TimelineAlignment.headerContentGap) {
       timelineHeader
       timelineContent
     }
     .frame(minWidth: 0, maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-    .padding(.top, 15)
+    .padding(.top, TimelineAlignment.topInset)
     .padding(.bottom, 15)
     .padding(.leading, 15)
     .padding(.trailing, 5)
@@ -605,11 +676,11 @@ extension MainView {
     let usable = max(0, availableWidth - reservation)
 
     // Matches the pinned widths of each control (Figma-spec accurate).
-    let chevronsWidth: CGFloat = 42  // 20 + 2 + 20
+    let chevronsWidth = (TimelineNavigationLayout.arrowSize * 2) + 2
     let calendarWidth: CGFloat = 36
     let dayWeekWidth: CGFloat = 104
     let todayWidth: CGFloat = 56
-    let gap: CGFloat = 4
+    let gap = TimelineNavigationLayout.calendarGap
     let datePad: CGFloat = 10
 
     var used = chevronsWidth + gap + calendarWidth
@@ -654,7 +725,7 @@ extension MainView {
   // at InstrumentSerif 26pt) can't grow the HStack when it appears. Without
   // this pin, the pills visibly shifted by ~0.5pt when the date entered.
   private func timelineLeadingControls(visibility: TimelineHeaderVisibility) -> some View {
-    HStack(spacing: 4) {
+    HStack(spacing: TimelineNavigationLayout.calendarGap) {
       timelineNavigationButtons
       timelineCalendarButton
 
@@ -673,7 +744,7 @@ extension MainView {
       }
     }
     .frame(height: 30)
-    .offset(x: timelineOffset)
+    .offset(x: timelineOffset + TimelineAlignment.pickerRowOffset)
     .opacity(timelineOpacity)
   }
 
@@ -688,44 +759,22 @@ extension MainView {
 
   private var timelineNavigationButtons: some View {
     HStack(spacing: 2) {
-      // Back — plain chevron matching the Figma, with a 28×28 hit box around
-      // the 14×14 glyph. `.contentShape(Rectangle())` makes the entire outer
-      // frame tappable (including transparent space around the glyph).
-      Button(action: {
+      TimelineNavigationButton(
+        assetName: "LeftArrow",
+        arrowSize: TimelineNavigationLayout.arrowSize,
+        hoverCircleSize: TimelineNavigationLayout.hoverCircleSize
+      ) {
         navigateTimeline(to: previousTimelineDate(), method: "prev")
-      }) {
-        Image("LeftArrow")
-          .resizable()
-          .scaledToFit()
-          .frame(width: 20, height: 20)
-          .contentShape(Rectangle())
       }
-      .buttonStyle(DayflowPressScaleButtonStyle())
-      .hoverScaleEffect(scale: 1.02)
-      .pointingHandCursorOnHover(reassertOnPressEnd: true)
 
-      // Forward — same pattern; stays disabled when we're already on today.
-      Button(action: {
-        guard canNavigateTimelineForward else { return }
+      TimelineNavigationButton(
+        assetName: "RightArrow",
+        isEnabled: canNavigateTimelineForward,
+        arrowSize: TimelineNavigationLayout.arrowSize,
+        hoverCircleSize: TimelineNavigationLayout.hoverCircleSize
+      ) {
         navigateTimeline(to: nextTimelineDate(), method: "next")
-      }) {
-        Image("RightArrow")
-          .resizable()
-          .scaledToFit()
-          .frame(width: 20, height: 20)
-          .contentShape(Rectangle())
-          .opacity(canNavigateTimelineForward ? 1 : 0.35)
       }
-      .buttonStyle(DayflowPressScaleButtonStyle())
-      .disabled(!canNavigateTimelineForward)
-      .hoverScaleEffect(
-        enabled: canNavigateTimelineForward,
-        scale: 1.02
-      )
-      .pointingHandCursorOnHover(
-        enabled: canNavigateTimelineForward,
-        reassertOnPressEnd: true
-      )
     }
   }
 
@@ -907,7 +956,7 @@ extension MainView {
             }
 
             Text(mode.title)
-              .font(.custom("Nunito", size: 12).weight(.medium))
+              .font(.custom("Figtree", size: 12).weight(.medium))
               .foregroundColor(isSelected ? .white : Color(hex: "796E64"))
               // Concrete width (52pt × 2 = 104pt container) instead of
               // `.frame(maxWidth: .infinity)`. The infinity was being fought
@@ -945,7 +994,7 @@ extension MainView {
       navigateTimeline(to: timelineDisplayDate(from: Date()), method: "today")
     }) {
       Text("Today")
-        .font(.custom("Nunito", size: 12).weight(.medium))
+        .font(.custom("Figtree", size: 12).weight(.medium))
         .foregroundColor(Color(hex: "796E64"))
         .padding(.horizontal, 10)
         // Explicit width pinned (natural ~52pt + 4pt safety margin). Same
@@ -986,7 +1035,7 @@ extension MainView {
         idleCategory: categoryStore.idleCategory,
         onManageCategories: { showCategoryEditor = true }
       )
-      .padding(.leading, 10)
+      .padding(.leading, 10 + TimelineAlignment.categoryRowInset)
       .opacity(contentOpacity)
 
       ZStack(alignment: .topLeading) {
@@ -999,7 +1048,21 @@ extension MainView {
             hasAnyActivities: $hasAnyActivities,
             refreshTrigger: $refreshActivitiesTrigger,
             weeklyHoursFrame: weeklyHoursFrame,
-            weeklyHoursIntersectsCard: $weeklyHoursIntersectsCard
+            weeklyHoursIntersectsCard: $weeklyHoursIntersectsCard,
+            contentLeadingInset: 0,
+            hourHeight: TimelineScale.hourHeight,
+            cardTextFontSize: TimelineTypography.cardTextFontSize,
+            cardTextFontWeight: TimelineTypography.cardTextFontWeight,
+            timeLabelFontSize: TimelineTypography.timeLabelFontSize,
+            cardIconLeadingInset: TimelineCardLayout.iconLeadingInset,
+            cardIconTextSpacing: TimelineCardLayout.iconTextSpacing,
+            cardFaviconSize: TimelineCardLayout.faviconSize,
+            cardFaviconVerticalOffset: TimelineCardLayout.faviconVerticalOffset,
+            cardCompactDurationThreshold: TimelineCardLayout.compactDurationThreshold,
+            cardCompactVerticalPadding: TimelineCardLayout.compactVerticalPadding,
+            cardNormalVerticalPadding: TimelineCardLayout.normalVerticalPadding,
+            cardHoverScale: TimelineCardLayout.hoverScale,
+            cardPressedScale: TimelineCardLayout.pressedScale
           )
           // Day is the zoomed-IN view (1/7 of a week). Entering Day feels
           // like diving into a single column: grow from 0.95 → 1 + fade in.
@@ -1037,9 +1100,18 @@ extension MainView {
     .frame(minWidth: 0, maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
   }
 
+  private var cardsToReviewPromptCount: Int {
+    guard cardsToReviewCount > 0 else { return 0 }
+    if hasRecentTimelineReviewRating || hasAnyTimelineReviewRating == false {
+      return cardsToReviewCount
+    }
+    return 0
+  }
+
   private var timelineFooter: some View {
     let weeklyHoursOpacity =
       weeklyHoursFadeOpacity * (weeklyHoursIntersectsCard ? 0 : 1)
+    let reviewPromptCount = cardsToReviewPromptCount
 
     return ZStack(alignment: .bottom) {
       HStack(alignment: .bottom) {
@@ -1053,8 +1125,8 @@ extension MainView {
       }
       .padding(.horizontal, 24)
 
-      if timelineMode == .day, cardsToReviewCount > 0 {
-        CardsToReviewButton(count: cardsToReviewCount) {
+      if timelineMode == .day, reviewPromptCount > 0 {
+        CardsToReviewButton(count: reviewPromptCount) {
           withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
             showTimelineReview = true
           }
@@ -1103,6 +1175,8 @@ extension MainView {
 
   @ViewBuilder
   private func dayTimelineInspectorContent(geo: GeometryProxy) -> some View {
+    let reviewPromptCount = cardsToReviewPromptCount
+
     if let activity = selectedActivity {
       timelineActivityInspector(activity: activity, geo: geo)
         .transition(.opacity.combined(with: .scale(scale: 0.98)))
@@ -1111,12 +1185,21 @@ extension MainView {
         selectedDate: selectedDate,
         categories: categoryStore.categories,
         storageManager: StorageManager.shared,
-        cardsToReviewCount: cardsToReviewCount,
+        cardsToReviewCount: reviewPromptCount,
         reviewRefreshToken: reviewSummaryRefreshToken,
+        recordingControlMode: RecordingControl.currentMode(
+          appState: appState,
+          pauseManager: pauseManager
+        ),
         onReviewTap: {
-          guard cardsToReviewCount > 0 else { return }
+          guard reviewPromptCount > 0 else { return }
           withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
             showTimelineReview = true
+          }
+        },
+        onShowGoalFlow: { presentation in
+          withAnimation(.spring(response: 0.32, dampingFraction: 0.9)) {
+            goalFlowPresentation = presentation
           }
         }
       )
@@ -1211,6 +1294,7 @@ extension MainView {
         .transition(.opacity)
         .zIndex(2)
       }
+
     }
   }
 
@@ -1246,10 +1330,10 @@ extension MainView {
 
     return
       (Text(parts.bold)
-      .font(Font.custom("Nunito", size: 10).weight(.bold))
+      .font(Font.custom("Figtree", size: 10).weight(.bold))
       .foregroundColor(textColor)
       + Text(parts.rest)
-      .font(Font.custom("Nunito", size: 10).weight(.regular))
+      .font(Font.custom("Figtree", size: 10).weight(.regular))
       .foregroundColor(textColor))
       .background(
         GeometryReader { proxy in
@@ -1284,7 +1368,7 @@ extension MainView {
             Image(systemName: "checkmark")
               .font(.system(size: 11.5, weight: .medium))
             Text("Copied")
-              .font(Font.custom("Nunito", size: 11.5).weight(.medium))
+              .font(Font.custom("Figtree", size: 11.5).weight(.medium))
           }
           .transition(.asymmetric(insertion: enterTransition, removal: exitTransition))
         } else {
@@ -1296,7 +1380,7 @@ extension MainView {
               .scaledToFit()
               .frame(width: 11.5, height: 11.5)
             Text("Copy timeline")
-              .font(Font.custom("Nunito", size: 11.5).weight(.medium))
+              .font(Font.custom("Figtree", size: 11.5).weight(.medium))
           }
           .transition(.asymmetric(insertion: enterTransition, removal: exitTransition))
         }
@@ -1352,7 +1436,7 @@ private struct TimelineFailureToastView: View {
           .padding(.top, 2)
 
         Text(message)
-          .font(.custom("Nunito", size: 13))
+          .font(.custom("Figtree", size: 13))
           .foregroundColor(.black.opacity(0.82))
           .fixedSize(horizontal: false, vertical: true)
 
@@ -1374,7 +1458,7 @@ private struct TimelineFailureToastView: View {
             Image(systemName: "gearshape")
               .font(.system(size: 12))
             Text("Open Provider Settings")
-              .font(.custom("Nunito", size: 12))
+              .font(.custom("Figtree", size: 12))
               .fontWeight(.semibold)
           }
         },
@@ -1413,12 +1497,12 @@ private struct ScreenRecordingPermissionNoticeView: View {
 
         VStack(alignment: .leading, spacing: 3) {
           Text("Screen recording access needed")
-            .font(.custom("Nunito", size: 13))
+            .font(.custom("Figtree", size: 13))
             .fontWeight(.semibold)
             .foregroundColor(.black.opacity(0.86))
 
           Text("Dayflow cannot update your timeline until access is restored.")
-            .font(.custom("Nunito", size: 12))
+            .font(.custom("Figtree", size: 12))
             .foregroundColor(.black.opacity(0.62))
             .fixedSize(horizontal: false, vertical: true)
         }
@@ -1441,7 +1525,7 @@ private struct ScreenRecordingPermissionNoticeView: View {
             Image(systemName: "gearshape")
               .font(.system(size: 12))
             Text("Open System Settings")
-              .font(.custom("Nunito", size: 12))
+              .font(.custom("Figtree", size: 12))
               .fontWeight(.semibold)
           }
         },
@@ -1569,7 +1653,7 @@ private struct TimelineCalendarPopover: View {
   private var monthHeader: some View {
     HStack(spacing: 0) {
       Text(Self.monthYearFormatter.string(from: displayMonth))
-        .font(.custom("Nunito", size: 14))
+        .font(.custom("Figtree", size: 14))
         .foregroundColor(.black)
         .lineLimit(1)
 
@@ -1601,7 +1685,7 @@ private struct TimelineCalendarPopover: View {
     .pointingHandCursor()
   }
 
-  // Weekday header uses Instrument Serif 12pt per Figma (not Nunito).
+  // Weekday header uses Instrument Serif 12pt per Figma (not Figtree).
   private var weekdayRow: some View {
     // `id: \.self` on ["S","M","T","W","T","F","S"] duplicates the "T" and
     // "S" IDs — SwiftUI logs "the ID T occurs multiple times" and the diff
@@ -1680,7 +1764,7 @@ private struct TimelineCalendarPopover: View {
             .frame(width: Self.selectedCircleSize, height: Self.selectedCircleSize)
         }
         Text(day.label)
-          .font(.custom("Nunito", size: 12))
+          .font(.custom("Figtree", size: 12))
           .foregroundColor(foregroundColor)
       }
       .frame(width: Self.columnWidth, height: Self.dayCellHeight)

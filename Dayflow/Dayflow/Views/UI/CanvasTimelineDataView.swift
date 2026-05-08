@@ -18,11 +18,70 @@ private let cachedTimeFormatter: DateFormatter = {
 }()
 
 private struct CanvasConfig {
-  static let hourHeight: CGFloat = 144  // 144px per hour (Canvas look)
-  static let pixelsPerMinute: CGFloat = 2.4  // 2.4px = 1 minute (Canvas look)
   static let timeColumnWidth: CGFloat = 60
   static let startHour: Int = 4  // 4 AM baseline
   static let endHour: Int = 28  // 4 AM next day
+}
+
+enum TimelineScale {
+  static let hourHeight: CGFloat = 168
+}
+
+enum TimelineCardLayout {
+  static let iconLeadingInset: CGFloat = 16
+  static let iconTextSpacing: CGFloat = 6
+  static let faviconSize: CGFloat = 18
+  static let faviconVerticalOffset: CGFloat = 0
+  static let compactDurationThreshold: CGFloat = 13
+  static let compactVerticalPadding: CGFloat = 0
+  static let normalVerticalPadding: CGFloat = 6
+  static let hoverScale: CGFloat = 1.005
+  static let pressedScale: CGFloat = 0.992
+}
+
+enum TimelineTypography {
+  static let cardTextFontSize: CGFloat = 16
+  static let cardTextFontWeight: TimelineCardTextWeight = .regular
+  static let timeLabelFontSize: CGFloat = 12
+
+  static func cardSecondaryTextFontSize(for cardTextFontSize: CGFloat) -> CGFloat {
+    max(8, cardTextFontSize - 3)
+  }
+}
+
+enum TimelineCardTextWeight: String, CaseIterable, Identifiable {
+  case regular
+  case medium
+  case semibold
+  case bold
+
+  var id: String { rawValue }
+
+  var label: String {
+    switch self {
+    case .regular:
+      return "Reg"
+    case .medium:
+      return "Med"
+    case .semibold:
+      return "Semi"
+    case .bold:
+      return "Bold"
+    }
+  }
+
+  var fontWeight: Font.Weight {
+    switch self {
+    case .regular:
+      return .regular
+    case .medium:
+      return .medium
+    case .semibold:
+      return .semibold
+    case .bold:
+      return .bold
+    }
+  }
 }
 
 struct TimelineTimeLabelFramesPreferenceKey: PreferenceKey {
@@ -75,6 +134,20 @@ struct CanvasTimelineDataView: View {
   @Binding var refreshTrigger: Int
   let weeklyHoursFrame: CGRect
   @Binding var weeklyHoursIntersectsCard: Bool
+  let contentLeadingInset: CGFloat
+  let hourHeight: CGFloat
+  let cardTextFontSize: CGFloat
+  let cardTextFontWeight: TimelineCardTextWeight
+  let timeLabelFontSize: CGFloat
+  let cardIconLeadingInset: CGFloat
+  let cardIconTextSpacing: CGFloat
+  let cardFaviconSize: CGFloat
+  let cardFaviconVerticalOffset: CGFloat
+  let cardCompactDurationThreshold: CGFloat
+  let cardCompactVerticalPadding: CGFloat
+  let cardNormalVerticalPadding: CGFloat
+  let cardHoverScale: CGFloat
+  let cardPressedScale: CGFloat
 
   @State private var selectedCardId: String? = nil
   @State private var positionedActivities: [CanvasPositionedActivity] = []
@@ -96,6 +169,14 @@ struct CanvasTimelineDataView: View {
   @EnvironmentObject private var retryCoordinator: RetryCoordinator
 
   private let storageManager = StorageManager.shared
+
+  private var pixelsPerMinute: CGFloat {
+    hourHeight / 60
+  }
+
+  private var timelineHeight: CGFloat {
+    CGFloat(CanvasConfig.endHour - CanvasConfig.startHour) * hourHeight
+  }
 
   private var recordingControlMode: RecordingControlMode {
     RecordingControl.currentMode(appState: appState, pauseManager: pauseManager)
@@ -140,6 +221,7 @@ struct CanvasTimelineDataView: View {
       .onChange(of: selectedDate) { loadActivities() }
       .onChange(of: refreshTrigger) { loadActivities() }
       .onChange(of: appState.isRecording) { loadActivities(animate: false) }
+      .onChange(of: hourHeight) { loadActivities(animate: false) }
       .onReceive(
         NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)
       ) { _ in
@@ -254,7 +336,8 @@ struct CanvasTimelineDataView: View {
       currentTimeIndicator
         .zIndex(10)
     }
-    .frame(height: CGFloat(CanvasConfig.endHour - CanvasConfig.startHour) * CanvasConfig.hourHeight)
+    .frame(height: timelineHeight)
+    .padding(.leading, contentLeadingInset)
     .background(Color.clear)
   }
 
@@ -263,11 +346,11 @@ struct CanvasTimelineDataView: View {
       ForEach(0..<(CanvasConfig.endHour - CanvasConfig.startHour), id: \.self) { _ in
         VStack(spacing: 0) {
           Rectangle()
-            .fill(Color(hex: "E2A97B"))
-            .frame(height: 1)
+            .fill(Color.black.opacity(0.1))
+            .frame(height: 0.75)
           Spacer()
         }
-        .frame(height: CanvasConfig.hourHeight)
+        .frame(height: hourHeight)
       }
     }
   }
@@ -277,7 +360,7 @@ struct CanvasTimelineDataView: View {
       ForEach(CanvasConfig.startHour..<CanvasConfig.endHour, id: \.self) { hour in
         let hourIndex = hour - CanvasConfig.startHour
         Text(formatHour(hour))
-          .font(.custom("Figtree", size: 13))
+          .font(.custom("Figtree", size: timeLabelFontSize))
           .foregroundColor(Color(hex: "594838"))
           .padding(.trailing, 5)
           .padding(.top, 2)
@@ -294,7 +377,7 @@ struct CanvasTimelineDataView: View {
               )
             }
           )
-          .frame(height: CanvasConfig.hourHeight, alignment: .top)
+          .frame(height: hourHeight, alignment: .top)
           .offset(y: -8)
           .id("hour-\(hourIndex)")
       }
@@ -340,7 +423,18 @@ struct CanvasTimelineDataView: View {
             faviconSecondaryRaw: item.faviconSecondaryRaw,
             faviconPrimaryHost: item.faviconPrimaryHost,
             faviconSecondaryHost: item.faviconSecondaryHost,
-            statusLine: retryCoordinator.statusLine(for: item.activity.batchId)
+            statusLine: retryCoordinator.statusLine(for: item.activity.batchId),
+            fontSize: cardTextFontSize,
+            fontWeight: cardTextFontWeight,
+            iconLeadingInset: cardIconLeadingInset,
+            iconTextSpacing: cardIconTextSpacing,
+            faviconSize: cardFaviconSize,
+            faviconVerticalOffset: cardFaviconVerticalOffset,
+            compactDurationThreshold: cardCompactDurationThreshold,
+            compactVerticalPadding: cardCompactVerticalPadding,
+            normalVerticalPadding: cardNormalVerticalPadding,
+            hoverScale: cardHoverScale,
+            pressedScale: cardPressedScale
           )
           .frame(width: geo.size.width, height: item.height)
           .position(x: geo.size.width / 2, y: item.yPosition + (item.height / 2))
@@ -523,7 +617,7 @@ struct CanvasTimelineDataView: View {
       Text("Generating your next card")
     }
     .font(
-      Font.custom("Nunito", size: 12)
+      Font.custom("Figtree", size: 12)
         .weight(.semibold)
     )
     .lineSpacing(2.4)
@@ -555,7 +649,7 @@ struct CanvasTimelineDataView: View {
       Text(message)
     }
     .font(
-      Font.custom("Nunito", size: 12)
+      Font.custom("Figtree", size: 12)
         .weight(.regular)
     )
     .lineSpacing(2.4)
@@ -643,7 +737,7 @@ struct CanvasTimelineDataView: View {
         let y = self.calculateYPosition(for: seg.start)
         // Card spacing: -2 total (1px top + 1px bottom)
         let durationMinutes = max(0, seg.end.timeIntervalSince(seg.start) / 60)
-        let rawHeight = CGFloat(durationMinutes) * CanvasConfig.pixelsPerMinute
+        let rawHeight = CGFloat(durationMinutes) * pixelsPerMinute
         let height = max(10, rawHeight - 2)
         // Raw values for pattern matching, normalized for network fetch
         let primaryRaw = seg.activity.appSites?.primary
@@ -979,7 +1073,7 @@ struct CanvasTimelineDataView: View {
 
   private func recordingProjectionHeight(for projection: RecordingProjectionWindow) -> CGFloat {
     let durationMinutes = max(0, projection.end.timeIntervalSince(projection.start) / 60)
-    let rawHeight = CGFloat(durationMinutes) * CanvasConfig.pixelsPerMinute
+    let rawHeight = CGFloat(durationMinutes) * pixelsPerMinute
     return max(10, rawHeight - 2)
   }
 
@@ -1080,7 +1174,7 @@ struct CanvasTimelineDataView: View {
     }
 
     let totalMinutes = hoursSince4AM * 60 + minute
-    return CGFloat(totalMinutes) * CanvasConfig.pixelsPerMinute
+    return CGFloat(totalMinutes) * pixelsPerMinute
   }
 
   private func formatHour(_ hour: Int) -> String {
@@ -1128,14 +1222,14 @@ extension CanvasTimelineDataView {
     // When scrolled to .top, this positions current time at ~80% down the viewport
     // Adjust hoursAbove to fine-tune: 5 = current time appears higher, 7 = lower
     let hoursAbove: CGFloat = 6
-    let anchorY = yNow - (hoursAbove * CanvasConfig.hourHeight)
+    let anchorY = yNow - (hoursAbove * hourHeight)
 
     // Create a frame that spans the full timeline height
     // Then position the anchor absolutely within it
     Color.clear
       .frame(
         width: 1,
-        height: CGFloat(CanvasConfig.endHour - CanvasConfig.startHour) * CanvasConfig.hourHeight
+        height: timelineHeight
       )
       .overlay(
         Rectangle()
@@ -1177,18 +1271,38 @@ struct CanvasActivityCard: View {
   let faviconPrimaryHost: String?
   let faviconSecondaryHost: String?
   let statusLine: String?
+  let fontSize: CGFloat
+  let fontWeight: TimelineCardTextWeight
+  let iconLeadingInset: CGFloat
+  let iconTextSpacing: CGFloat
+  let faviconSize: CGFloat
+  let faviconVerticalOffset: CGFloat
+  let compactDurationThreshold: CGFloat
+  let compactVerticalPadding: CGFloat
+  let normalVerticalPadding: CGFloat
+  let hoverScale: CGFloat
+  let pressedScale: CGFloat
 
   private var isFailedCard: Bool {
     title == "Processing failed"
   }
 
   private var isCompactCard: Bool {
-    durationMinutes < 13
+    durationMinutes < Double(compactDurationThreshold)
+  }
+
+  private var verticalPadding: CGFloat {
+    guard !isFailedCard else { return 0 }
+    return isCompactCard ? compactVerticalPadding : normalVerticalPadding
+  }
+
+  private var secondaryFontSize: CGFloat {
+    TimelineTypography.cardSecondaryTextFontSize(for: fontSize)
   }
 
   private var backupIndicator: some View {
     Text("!")
-      .font(Font.custom("Nunito", size: 9).weight(.semibold))
+      .font(Font.custom("Figtree", size: 9).weight(.semibold))
       .foregroundColor(Color(red: 0.4, green: 0.4, blue: 0.4))
       .frame(width: 14, height: 14)
       .background(
@@ -1217,15 +1331,15 @@ struct CanvasActivityCard: View {
         onTap()
       }
     }) {
-      HStack(alignment: .top, spacing: isFailedCard ? 10 : 8) {
+      HStack(alignment: .top, spacing: isFailedCard ? 10 : iconTextSpacing) {
         if durationMinutes >= 10 {
           if isFailedCard {
             VStack(alignment: .leading, spacing: 4) {
               HStack(alignment: .top, spacing: 8) {
                 Text(title)
                   .font(
-                    Font.custom("Nunito", size: 13)
-                      .weight(.semibold)
+                    Font.custom("Figtree", size: fontSize)
+                      .weight(fontWeight.fontWeight)
                   )
                   .foregroundColor(style.text)
 
@@ -1233,7 +1347,7 @@ struct CanvasActivityCard: View {
 
                 Text(time)
                   .font(
-                    Font.custom("Nunito", size: 10)
+                    Font.custom("Figtree", size: secondaryFontSize)
                       .weight(.medium)
                   )
                   .foregroundColor(style.time)
@@ -1243,7 +1357,7 @@ struct CanvasActivityCard: View {
 
               if let statusLine = statusLine {
                 Text(statusLine)
-                  .font(Font.custom("Nunito", size: 10))
+                  .font(Font.custom("Figtree", size: secondaryFontSize))
                   .foregroundColor(Color(red: 0.55, green: 0.45, blue: 0.4))
                   .lineLimit(1)
                   .truncationMode(.tail)
@@ -1255,15 +1369,16 @@ struct CanvasActivityCard: View {
                 primaryRaw: faviconPrimaryRaw,
                 secondaryRaw: faviconSecondaryRaw,
                 primaryHost: faviconPrimaryHost,
-                secondaryHost: faviconSecondaryHost
+                secondaryHost: faviconSecondaryHost,
+                size: faviconSize
               )
-              .frame(width: 16, height: 16)
+              .offset(y: faviconVerticalOffset)
             }
 
             Text(title)
               .font(
-                Font.custom("Nunito", size: 13)
-                  .weight(.semibold)
+                Font.custom("Figtree", size: fontSize)
+                  .weight(fontWeight.fontWeight)
               )
               .foregroundColor(style.text)
 
@@ -1276,7 +1391,7 @@ struct CanvasActivityCard: View {
 
               Text(time)
                 .font(
-                  Font.custom("Nunito", size: 10)
+                  Font.custom("Figtree", size: secondaryFontSize)
                     .weight(.medium)
                 )
                 .foregroundColor(style.time)
@@ -1286,8 +1401,9 @@ struct CanvasActivityCard: View {
           }
         }
       }
-      .padding(.horizontal, 10)
-      .padding(.vertical, isFailedCard ? 0 : (isCompactCard ? 0 : 6))
+      .padding(.leading, iconLeadingInset)
+      .padding(.trailing, 10)
+      .padding(.vertical, verticalPadding)
       .frame(
         maxWidth: .infinity,
         minHeight: height,
@@ -1341,9 +1457,9 @@ struct CanvasActivityCard: View {
         y: 2
       )
     }
-    .buttonStyle(CanvasCardButtonStyle())
+    .buttonStyle(CanvasCardButtonStyle(pressedScale: pressedScale))
     .pointingHandCursor()
-    .hoverScaleEffect(scale: 1.01)
+    .hoverScaleEffect(scale: hoverScale)
     .onHover { hovering in
       isHovering = hovering
     }
@@ -1353,11 +1469,13 @@ struct CanvasActivityCard: View {
 }
 
 struct CanvasCardButtonStyle: ButtonStyle {
+  var pressedScale: CGFloat = TimelineCardLayout.pressedScale
+
   func makeBody(configuration: Configuration) -> some View {
     configuration.label
       .dayflowPressScale(
         configuration.isPressed,
-        pressedScale: 0.98,
+        pressedScale: pressedScale,
         animation: .spring(response: 0.3, dampingFraction: 0.6)
       )
   }
@@ -1378,7 +1496,21 @@ struct CanvasCardButtonStyle: ButtonStyle {
         hasAnyActivities: .constant(true),
         refreshTrigger: $refresh,
         weeklyHoursFrame: .zero,
-        weeklyHoursIntersectsCard: $weeklyHoursIntersectsCard
+        weeklyHoursIntersectsCard: $weeklyHoursIntersectsCard,
+        contentLeadingInset: 0,
+        hourHeight: TimelineScale.hourHeight,
+        cardTextFontSize: TimelineTypography.cardTextFontSize,
+        cardTextFontWeight: TimelineTypography.cardTextFontWeight,
+        timeLabelFontSize: TimelineTypography.timeLabelFontSize,
+        cardIconLeadingInset: TimelineCardLayout.iconLeadingInset,
+        cardIconTextSpacing: TimelineCardLayout.iconTextSpacing,
+        cardFaviconSize: TimelineCardLayout.faviconSize,
+        cardFaviconVerticalOffset: TimelineCardLayout.faviconVerticalOffset,
+        cardCompactDurationThreshold: TimelineCardLayout.compactDurationThreshold,
+        cardCompactVerticalPadding: TimelineCardLayout.compactVerticalPadding,
+        cardNormalVerticalPadding: TimelineCardLayout.normalVerticalPadding,
+        cardHoverScale: TimelineCardLayout.hoverScale,
+        cardPressedScale: TimelineCardLayout.pressedScale
       )
       .frame(width: 800, height: 600)
       .environmentObject(CategoryStore())
@@ -1396,6 +1528,7 @@ private struct FaviconOrSparkleView: View {
   // Normalized hosts for network fetch
   let primaryHost: String?
   let secondaryHost: String?
+  let size: CGFloat
   @State private var image: NSImage? = nil
   @State private var didStart = false
 
@@ -1406,12 +1539,12 @@ private struct FaviconOrSparkleView: View {
           .resizable()
           .interpolation(.high)
           .aspectRatio(contentMode: .fit)
-          .frame(width: 16, height: 16)
           .clipShape(RoundedRectangle(cornerRadius: 2, style: .continuous))
       } else {
         Color.clear
       }
     }
+    .frame(width: size, height: size)
     .onAppear {
       guard !didStart else { return }
       didStart = true
