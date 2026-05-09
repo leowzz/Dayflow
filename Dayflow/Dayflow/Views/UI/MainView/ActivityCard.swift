@@ -107,7 +107,7 @@ struct ActivityCard: View {
         Spacer()
         if hasAnyActivities {
           Text("Select an activity to view details")
-            .font(.custom("Nunito", size: 15))
+            .font(.custom("Figtree", size: 15))
             .fontWeight(.regular)
             .foregroundColor(.gray.opacity(0.5))
         } else {
@@ -119,7 +119,7 @@ struct ActivityCard: View {
               Text(
                 "Cards are generated about every 15 minutes. If Dayflow is on and no cards show up within 30 minutes, please report a bug."
               )
-              .font(.custom("Nunito", size: 13))
+              .font(.custom("Figtree", size: 13))
               .foregroundColor(.gray.opacity(0.6))
               .multilineTextAlignment(.center)
               .padding(.horizontal, 16)
@@ -130,7 +130,7 @@ struct ActivityCard: View {
                 .font(.system(size: 14, weight: .semibold))
                 .foregroundColor(.gray.opacity(0.7))
               Text("Dayflow recording is currently turned off, so cards aren’t being produced.")
-                .font(.custom("Nunito", size: 13))
+                .font(.custom("Figtree", size: 13))
                 .foregroundColor(.gray.opacity(0.6))
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 16)
@@ -155,7 +155,7 @@ struct ActivityCard: View {
         VStack(alignment: .leading, spacing: 6) {
           Text(activity.title)
             .font(
-              Font.custom("Nunito", size: 16)
+              Font.custom("Figtree", size: 16)
                 .weight(.semibold)
             )
             .foregroundColor(.black)
@@ -165,7 +165,7 @@ struct ActivityCard: View {
               "\(timeFormatter.string(from: activity.startTime)) - \(timeFormatter.string(from: activity.endTime))"
             )
             .font(
-              Font.custom("Nunito", size: 12)
+              Font.custom("Figtree", size: 12)
             )
             .foregroundColor(Color(red: 0.4, green: 0.4, blue: 0.4))
             .lineLimit(1)
@@ -189,7 +189,7 @@ struct ActivityCard: View {
                     .frame(width: 8, height: 8)
 
                   Text(badge.name)
-                    .font(Font.custom("Nunito", size: 12))
+                    .font(Font.custom("Figtree", size: 12))
                     .foregroundColor(Color(red: 0.2, green: 0.2, blue: 0.2))
                     .lineLimit(1)
                 }
@@ -236,7 +236,7 @@ struct ActivityCard: View {
       if isFailedCard(activity), let statusLine = retryCoordinator.statusLine(for: activity.batchId)
       {
         Text(statusLine)
-          .font(.custom("Nunito", size: 11))
+          .font(.custom("Figtree", size: 11))
           .foregroundColor(Color(red: 0.5, green: 0.5, blue: 0.5))
           .lineLimit(1)
       }
@@ -288,14 +288,14 @@ struct ActivityCard: View {
       VStack(alignment: .leading, spacing: 3) {
         Text("SUMMARY")
           .font(
-            Font.custom("Nunito", size: 12)
+            Font.custom("Figtree", size: 12)
               .weight(.semibold)
           )
           .foregroundColor(Color(red: 0.55, green: 0.55, blue: 0.55))
 
         renderMarkdownText(activity.summary)
           .font(
-            Font.custom("Nunito", size: 12)
+            Font.custom("Figtree", size: 12)
           )
           .foregroundColor(.black)
           .lineLimit(nil)
@@ -307,14 +307,14 @@ struct ActivityCard: View {
         VStack(alignment: .leading, spacing: 3) {
           Text("DETAILED SUMMARY")
             .font(
-              Font.custom("Nunito", size: 12)
+              Font.custom("Figtree", size: 12)
                 .weight(.semibold)
             )
             .foregroundColor(Color(red: 0.55, green: 0.55, blue: 0.55))
 
           renderMarkdownText(formattedDetailedSummary(activity.detailedSummary))
             .font(
-              Font.custom("Nunito", size: 12)
+              Font.custom("Figtree", size: 12)
             )
             .foregroundColor(.black)
             .lineLimit(nil)
@@ -399,7 +399,7 @@ struct ActivityCard: View {
           .frame(width: 16, height: 16)
 
         Text("Processing")
-          .font(.custom("Nunito", size: 13))
+          .font(.custom("Figtree", size: 13))
           .foregroundColor(Color(red: 0.4, green: 0.4, blue: 0.4))
           .lineLimit(1)
       }
@@ -412,7 +412,7 @@ struct ActivityCard: View {
       Button(action: { handleRetry(for: activity) }) {
         HStack(alignment: .center, spacing: 4) {
           Text("Retry")
-            .font(.custom("Nunito", size: 13).weight(.medium))
+            .font(.custom("Figtree", size: 13).weight(.medium))
           Image(systemName: "arrow.clockwise")
             .font(.system(size: 13, weight: .medium))
         }
@@ -483,7 +483,7 @@ struct ActivityCard: View {
                 ProgressView()
                   .scaleEffect(0.8)
                 Text("Preparing timelapse...")
-                  .font(.custom("Nunito", size: 12).weight(.semibold))
+                  .font(.custom("Figtree", size: 12).weight(.semibold))
                   .foregroundColor(.white)
               }
             }
@@ -522,7 +522,7 @@ struct ActivityCard: View {
 
       if let errorMessage = slideshowError {
         Text(errorMessage)
-          .font(Font.custom("Nunito", size: 11))
+          .font(Font.custom("Figtree", size: 11))
           .foregroundColor(Color(red: 0.76, green: 0.16, blue: 0.2))
       }
     }
