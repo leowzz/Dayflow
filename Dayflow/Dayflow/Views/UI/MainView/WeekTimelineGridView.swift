@@ -268,7 +268,7 @@ struct WeekTimelineGridView: View {
       ForEach(weekRange.days) { day in
         HStack(spacing: WeekTimelineConfig.weekdayInlineSpacing) {
           Text(day.weekdayLabel)
-            .font(.custom("Nunito", size: 12).weight(.medium))
+            .font(.custom("Figtree", size: 12).weight(.medium))
             .foregroundColor(Color(hex: "333333"))
 
           dayNumberBadge(for: day)
@@ -284,7 +284,7 @@ struct WeekTimelineGridView: View {
 
     if isToday {
       Text(day.dayNumber)
-        .font(.custom("Nunito", size: 12).weight(.semibold))
+        .font(.custom("Figtree", size: 12).weight(.semibold))
         .foregroundColor(.white)
         .frame(width: 18, height: 18)
         .background(
@@ -293,7 +293,7 @@ struct WeekTimelineGridView: View {
         )
     } else {
       Text(day.dayNumber)
-        .font(.custom("Nunito", size: 12).weight(.medium))
+        .font(.custom("Figtree", size: 12).weight(.medium))
         .foregroundColor(Color(hex: "333333"))
     }
   }
@@ -581,18 +581,18 @@ struct WeekTimelineGridView: View {
         TimelineThinkingSpinner(config: spinnerConfig, visualScale: 0.4)
         if !compact {
           Text("Next card...")
-            .font(.custom("Nunito", size: 10).weight(.semibold))
+            .font(.custom("Figtree", size: 10).weight(.semibold))
             .foregroundColor(.white)
             .lineLimit(1)
         }
       }
     case .pausedTimed, .pausedIndefinite:
       Label("Paused", systemImage: "pause.fill")
-        .font(.custom("Nunito", size: 10).weight(.medium))
+        .font(.custom("Figtree", size: 10).weight(.medium))
         .foregroundColor(Color(hex: "888D95"))
     case .stopped:
       Label("Resume", systemImage: "play.fill")
-        .font(.custom("Nunito", size: 10).weight(.medium))
+        .font(.custom("Figtree", size: 10).weight(.medium))
         .foregroundColor(Color(hex: "888D95"))
     }
   }
@@ -1077,7 +1077,7 @@ private struct WeekTimelineActivityCard: View {
   // gated on `isCompact` and forced 1 line for any "short-duration" card,
   // which truncated titles even when 2+ lines would clearly fit. Here we
   // derive the line count from the real text-area height: card height
-  // minus both vertical paddings, divided by Nunito 10's line-height
+  // minus both vertical paddings, divided by Figtree 10's line-height
   // (~12pt). `max(1, …)` guarantees at least one line for the smallest
   // cards.
   private var maxUnhoveredTitleLines: Int {
@@ -1136,7 +1136,7 @@ private struct WeekTimelineActivityCard: View {
 
       VStack(alignment: .leading, spacing: 2) {
         Text(title)
-          .font(.custom("Nunito", size: titleFontSize).weight(.semibold))
+          .font(.custom("Figtree", size: titleFontSize).weight(.semibold))
           .foregroundColor(palette.title)
           .multilineTextAlignment(.leading)
           .lineLimit(renderingExpanded ? nil : maxUnhoveredTitleLines)
@@ -1220,7 +1220,7 @@ private struct WeekTimelineActivityCard: View {
 
       VStack(alignment: .leading, spacing: 2) {
         Text(title)
-          .font(.custom("Nunito", size: titleFontSize).weight(.semibold))
+          .font(.custom("Figtree", size: titleFontSize).weight(.semibold))
           .multilineTextAlignment(.leading)
           .fixedSize(horizontal: false, vertical: true)
 
@@ -1258,7 +1258,7 @@ private struct WeekTimelineActivityCard: View {
       }
 
       Text(statusLine)
-        .font(.custom("Nunito", size: 9))
+        .font(.custom("Figtree", size: 9))
         .foregroundColor(Color(hex: "7A6254"))
         .lineLimit(renderingExpanded ? nil : 1)
         .truncationMode(.tail)
@@ -1319,12 +1319,12 @@ private struct WeekTimelineHoverPrototypeHarness: View {
     VStack(alignment: .leading, spacing: 12) {
       VStack(alignment: .leading, spacing: 4) {
         Text("Hover-expand prototype")
-          .font(.custom("Nunito", size: 13).weight(.semibold))
+          .font(.custom("Figtree", size: 13).weight(.semibold))
           .foregroundColor(Color(hex: "333333"))
         Text(
           "Hover a short card — the card grows to reveal the full title. No text shifts; only new lines appear below."
         )
-        .font(.custom("Nunito", size: 11))
+        .font(.custom("Figtree", size: 11))
         .foregroundColor(Color(hex: "6B5548"))
       }
 
