@@ -34,7 +34,7 @@ private struct ChatMarkdownBlockView: View {
     case .paragraph(let text):
       ChatMarkdownInlineText(
         content: text,
-        font: .custom("Nunito", size: 13).weight(.medium),
+        font: .custom("Figtree", size: 13).weight(.medium),
         textColor: textColor
       )
     case .heading(let level, let text):
@@ -57,7 +57,7 @@ private struct ChatMarkdownBlockView: View {
 
         ChatMarkdownInlineText(
           content: text,
-          font: .custom("Nunito", size: 13).weight(.medium),
+          font: .custom("Figtree", size: 13).weight(.medium),
           textColor: Color(hex: "5A5147")
         )
       }
@@ -70,11 +70,11 @@ private struct ChatMarkdownBlockView: View {
   private func headingFont(for level: Int) -> Font {
     switch level {
     case 1:
-      return .custom("Nunito", size: 17).weight(.bold)
+      return .custom("Figtree", size: 17).weight(.bold)
     case 2:
-      return .custom("Nunito", size: 15).weight(.bold)
+      return .custom("Figtree", size: 15).weight(.bold)
     default:
-      return .custom("Nunito", size: 14).weight(.semibold)
+      return .custom("Figtree", size: 14).weight(.semibold)
     }
   }
 }
@@ -86,13 +86,13 @@ private struct ChatMarkdownListRow: View {
   var body: some View {
     HStack(alignment: .top, spacing: 8) {
       Text(item.marker)
-        .font(.custom("Nunito", size: 13).weight(.bold))
+        .font(.custom("Figtree", size: 13).weight(.bold))
         .foregroundColor(textColor)
         .frame(width: 18, alignment: .trailing)
 
       ChatMarkdownInlineText(
         content: item.content,
-        font: .custom("Nunito", size: 13).weight(.medium),
+        font: .custom("Figtree", size: 13).weight(.medium),
         textColor: textColor
       )
     }
@@ -108,7 +108,7 @@ private struct ChatMarkdownCodeBlock: View {
     VStack(alignment: .leading, spacing: 8) {
       if let language, !language.isEmpty {
         Text(language.uppercased())
-          .font(.custom("Nunito", size: 10).weight(.bold))
+          .font(.custom("Figtree", size: 10).weight(.bold))
           .foregroundColor(Color(hex: "9A7C60"))
       }
 

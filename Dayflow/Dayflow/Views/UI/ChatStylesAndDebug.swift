@@ -58,7 +58,7 @@ struct ProviderTogglePill: View {
   var body: some View {
     Button(action: action) {
       Text(title)
-        .font(.custom("Nunito", size: 12).weight(.semibold))
+        .font(.custom("Figtree", size: 12).weight(.semibold))
         .foregroundColor(textColor)
         .padding(.horizontal, 10)
         .padding(.vertical, 6)
@@ -87,13 +87,13 @@ struct DebugLogEntry: View {
       // Header with type and timestamp
       HStack(spacing: 6) {
         Text(entry.type.rawValue)
-          .font(.custom("Nunito", size: 10).weight(.bold))
+          .font(.custom("Figtree", size: 10).weight(.bold))
           .foregroundColor(Color(hex: entry.typeColor))
 
         Spacer()
 
         Text(formatTimestamp(entry.timestamp))
-          .font(.custom("Nunito", size: 9))
+          .font(.custom("Figtree", size: 9))
           .foregroundColor(Color(hex: "AAAAAA"))
       }
 
@@ -181,7 +181,7 @@ struct ThinkingIndicator: View {
         .foregroundColor(Color(hex: "F96E00"))
 
       Text("Thinking")
-        .font(.custom("Nunito", size: 12).weight(.semibold))
+        .font(.custom("Figtree", size: 12).weight(.semibold))
         .foregroundColor(Color(hex: "8B5E3C"))
 
       HStack(spacing: 3) {

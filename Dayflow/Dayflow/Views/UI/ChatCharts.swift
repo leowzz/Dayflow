@@ -344,7 +344,7 @@ struct ChatChartBlockView: View {
       let title = spec.title.trimmingCharacters(in: .whitespacesAndNewlines)
       if !title.isEmpty {
         Text(title)
-          .font(.custom("Nunito", size: 12).weight(.semibold))
+          .font(.custom("Figtree", size: 12).weight(.semibold))
           .foregroundColor(Color(hex: "4A4A4A"))
       }
       chartBody

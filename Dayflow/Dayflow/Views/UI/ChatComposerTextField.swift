@@ -18,7 +18,7 @@ struct AppKitComposerTextField: NSViewRepresentable {
     textField.delegate = context.coordinator
     textField.stringValue = text
     textField.font =
-      NSFont(name: "Nunito-Medium", size: 16) ?? NSFont.systemFont(ofSize: 16, weight: .medium)
+      NSFont(name: "Figtree-Medium", size: 16) ?? NSFont.systemFont(ofSize: 16, weight: .medium)
     textField.textColor = NSColor(hex: "2F2A24") ?? .labelColor
     textField.alignment = .left
     textField.lineBreakMode = .byTruncatingTail
@@ -33,7 +33,7 @@ struct AppKitComposerTextField: NSViewRepresentable {
     textField.translatesAutoresizingMaskIntoConstraints = false
     textField.configurePlaceholder(
       placeholder,
-      font: NSFont(name: "Nunito-Medium", size: 16)
+      font: NSFont(name: "Figtree-Medium", size: 16)
         ?? NSFont.systemFont(ofSize: 16, weight: .medium),
       color: NSColor(hex: "9B948D") ?? .secondaryLabelColor
     )

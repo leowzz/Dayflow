@@ -13,7 +13,7 @@ extension ChatView {
         if !chatService.messages.isEmpty {
           Button(action: { resetConversation() }) {
             Text("Clear")
-              .font(.custom("Nunito", size: 12).weight(.semibold))
+              .font(.custom("Figtree", size: 12).weight(.semibold))
               .foregroundColor(Color(hex: "F96E00"))
               .padding(.horizontal, 10)
               .padding(.vertical, 6)
@@ -154,7 +154,7 @@ extension ChatView {
       // Header
       HStack {
         Text("Debug Log")
-          .font(.custom("Nunito", size: 12).weight(.bold))
+          .font(.custom("Figtree", size: 12).weight(.bold))
           .foregroundColor(Color(hex: "666666"))
 
         Spacer()
@@ -209,11 +209,11 @@ extension ChatView {
     VStack(alignment: .leading, spacing: 0) {
       HStack {
         Text("Memory")
-          .font(.custom("Nunito", size: 12).weight(.bold))
+          .font(.custom("Figtree", size: 12).weight(.bold))
           .foregroundColor(Color(hex: "666666"))
         Spacer()
         Text("\(memoryCharacterCount)/\(DashboardChatMemoryStore.maxCharacters)")
-          .font(.custom("Nunito", size: 11))
+          .font(.custom("Figtree", size: 11))
           .foregroundColor(Color(hex: "999999"))
       }
       .padding(.horizontal, 12)
@@ -224,11 +224,11 @@ extension ChatView {
 
       VStack(alignment: .leading, spacing: 8) {
         Text("Auto-updated from assistant replies. You can edit this manually.")
-          .font(.custom("Nunito", size: 11))
+          .font(.custom("Figtree", size: 11))
           .foregroundColor(Color(hex: "8A8A8A"))
 
         TextEditor(text: $memoryDraft)
-          .font(.custom("Nunito", size: 12))
+          .font(.custom("Figtree", size: 12))
           .padding(8)
           .background(Color(hex: "FFFCF8"))
           .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
@@ -243,7 +243,7 @@ extension ChatView {
 
         HStack {
           Text("Last updated: \(memoryUpdatedLabel)")
-            .font(.custom("Nunito", size: 10))
+            .font(.custom("Figtree", size: 10))
             .foregroundColor(Color(hex: "999999"))
           Spacer()
         }
@@ -251,14 +251,14 @@ extension ChatView {
         HStack(spacing: 8) {
           Button("Save") { saveMemoryDraft() }
             .buttonStyle(.plain)
-            .font(.custom("Nunito", size: 11).weight(.bold))
+            .font(.custom("Figtree", size: 11).weight(.bold))
             .foregroundColor(isMemoryDirty ? Color(hex: "F96E00") : Color(hex: "999999"))
             .disabled(!isMemoryDirty)
             .pointingHandCursor()
 
           Button("Reload") { reloadMemoryDraft() }
             .buttonStyle(.plain)
-            .font(.custom("Nunito", size: 11).weight(.bold))
+            .font(.custom("Figtree", size: 11).weight(.bold))
             .foregroundColor(isMemoryDirty ? Color(hex: "555555") : Color(hex: "AAAAAA"))
             .disabled(!isMemoryDirty)
             .pointingHandCursor()
@@ -267,7 +267,7 @@ extension ChatView {
 
           Button("Clear") { clearMemoryDraft() }
             .buttonStyle(.plain)
-            .font(.custom("Nunito", size: 11).weight(.bold))
+            .font(.custom("Figtree", size: 11).weight(.bold))
             .foregroundColor(storedMemoryBlob.isEmpty ? Color(hex: "AAAAAA") : Color(hex: "C85A4B"))
             .disabled(storedMemoryBlob.isEmpty)
             .pointingHandCursor()
@@ -327,11 +327,11 @@ extension ChatView {
                 .foregroundColor(Color(hex: "2F2A24"))
 
               Text("Ask questions, analyze your timeline, and generate charts/graphs.")
-                .font(.custom("Nunito", size: 13).weight(.semibold))
+                .font(.custom("Figtree", size: 13).weight(.semibold))
                 .foregroundColor(Color(hex: "7D6B5B"))
 
               Text("I remember your response preferences, so feel free to teach me your style.")
-                .font(.custom("Nunito", size: 12))
+                .font(.custom("Figtree", size: 12))
                 .foregroundColor(Color(hex: "8A7765"))
             }
 
@@ -340,7 +340,7 @@ extension ChatView {
 
           VStack(alignment: .leading, spacing: 10) {
             Text("Try one of these")
-              .font(.custom("Nunito", size: 12).weight(.bold))
+              .font(.custom("Figtree", size: 12).weight(.bold))
               .foregroundColor(Color(hex: "8A7765"))
 
             ForEach(Array(welcomePrompts.enumerated()), id: \.offset) { index, prompt in
@@ -387,7 +387,7 @@ extension ChatView {
           .foregroundColor(Color(hex: "593D2A"))
 
         Text("BETA")
-          .font(.custom("Nunito-Bold", size: 11))
+          .font(.custom("Figtree-Bold", size: 11))
           .foregroundColor(.white)
           .padding(.horizontal, 8)
           .padding(.vertical, 4)
@@ -404,13 +404,13 @@ extension ChatView {
         Text(
           "Chat lets you ask questions about your Dayflow activity and get summaries, comparisons, and insights."
         )
-        .font(.custom("Nunito-Regular", size: 14))
+        .font(.custom("Figtree-Regular", size: 14))
         .foregroundColor(Color(hex: "593D2A").opacity(0.85))
         .multilineTextAlignment(.center)
         .frame(maxWidth: 600)
 
         Text("Please send feedback if you see any bugs or weird behavior!")
-          .font(.custom("Nunito-SemiBold", size: 14))
+          .font(.custom("Figtree-SemiBold", size: 14))
           .foregroundColor(Color(hex: "593D2A"))
           .multilineTextAlignment(.center)
       }
@@ -429,18 +429,18 @@ extension ChatView {
 
           if anyRuntimeAvailable {
             Text("Gemini key or CLI runtime detected")
-              .font(.custom("Nunito-SemiBold", size: 15))
+              .font(.custom("Figtree-SemiBold", size: 15))
               .foregroundColor(Color(hex: "34C759"))
               .transition(.opacity.combined(with: .scale(scale: 0.95)))
           } else {
             Text("Gemini API key or CLI required")
-              .font(.custom("Nunito-SemiBold", size: 15))
+              .font(.custom("Figtree-SemiBold", size: 15))
               .foregroundColor(Color(hex: "593D2A"))
 
             Text(
               "Unlock chat by either adding a Gemini API key in Settings or installing Codex/Claude CLI."
             )
-            .font(.custom("Nunito-Regular", size: 13))
+            .font(.custom("Figtree-Regular", size: 13))
             .foregroundColor(Color(hex: "593D2A").opacity(0.8))
             .multilineTextAlignment(.center)
           }
@@ -454,7 +454,7 @@ extension ChatView {
           }
         }) {
           Text(anyRuntimeAvailable ? "Unlock Beta" : "Configure a runtime to continue")
-            .font(.custom("Nunito-SemiBold", size: 15))
+            .font(.custom("Figtree-SemiBold", size: 15))
             .foregroundColor(anyRuntimeAvailable ? Color(hex: "593D2A") : Color(hex: "999999"))
             .padding(.horizontal, 28)
             .padding(.vertical, 12)
@@ -502,13 +502,13 @@ extension ChatView {
       // Privacy Note (at bottom)
       VStack(spacing: 4) {
         Text("Privacy Note")
-          .font(.custom("Nunito-SemiBold", size: 12))
+          .font(.custom("Figtree-SemiBold", size: 12))
           .foregroundColor(Color(hex: "593D2A").opacity(0.6))
 
         Text(
           "During the beta, your questions are logged to help improve the product. Responses are not logged, so your privacy is maintained."
         )
-        .font(.custom("Nunito-Regular", size: 12))
+        .font(.custom("Figtree-Regular", size: 12))
         .foregroundColor(Color(hex: "593D2A").opacity(0.5))
         .multilineTextAlignment(.center)
         .frame(maxWidth: 600)
@@ -554,7 +554,7 @@ extension ChatView {
               .scaleEffect(0.55)
               .tint(Color(hex: "C18043"))
             Text("Answering")
-              .font(.custom("Nunito", size: 11).weight(.bold))
+              .font(.custom("Figtree", size: 11).weight(.bold))
               .foregroundColor(Color(hex: "9B7753"))
           }
           .padding(.horizontal, 9)
@@ -687,7 +687,7 @@ extension ChatView {
   var followUpSuggestions: some View {
     VStack(alignment: .leading, spacing: 8) {
       Text("Follow up")
-        .font(.custom("Nunito", size: 11).weight(.semibold))
+        .font(.custom("Figtree", size: 11).weight(.semibold))
         .foregroundColor(Color(hex: "999999"))
 
       ChatFlowLayout(spacing: 8) {

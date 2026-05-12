@@ -22,7 +22,7 @@ struct MessageBubble: View {
     HStack {
       Spacer(minLength: 60)
       Text(message.content)
-        .font(.custom("Nunito", size: 13).weight(.medium))
+        .font(.custom("Figtree", size: 13).weight(.medium))
         .foregroundColor(.white)
         .textSelection(.enabled)
         .padding(.horizontal, 14)
@@ -191,7 +191,7 @@ struct AssistantMessageFeedbackRow: View {
 
       if showsThanks {
         Text("Thanks")
-          .font(.custom("Nunito", size: 11).weight(.semibold))
+          .font(.custom("Figtree", size: 11).weight(.semibold))
           .foregroundColor(Color(hex: "9A7C60"))
           .transition(thanksTransition)
       }

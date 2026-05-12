@@ -15,7 +15,7 @@ struct WorkStatusCard: View {
 
         if status.stage == .error, let message = status.errorMessage, !message.isEmpty {
           Text(message)
-            .font(.custom("Nunito", size: 12).weight(.semibold))
+            .font(.custom("Figtree", size: 12).weight(.semibold))
             .foregroundColor(Color(hex: "C62828"))
         }
 
@@ -34,7 +34,7 @@ struct WorkStatusCard: View {
               Image(systemName: showDetails ? "chevron.up" : "chevron.down")
                 .font(.system(size: 9, weight: .semibold))
             }
-            .font(.custom("Nunito", size: 11).weight(.semibold))
+            .font(.custom("Figtree", size: 11).weight(.semibold))
             .foregroundColor(Color(hex: "8B5E3C"))
           }
           .buttonStyle(DayflowPressScaleButtonStyle(pressedScale: 0.97))
@@ -79,7 +79,7 @@ struct WorkStatusCard: View {
           AnimatedEllipsis()
         }
       }
-      .font(.custom("Nunito", size: 12).weight(.semibold))
+      .font(.custom("Figtree", size: 12).weight(.semibold))
       .foregroundColor(Color(hex: "4A4A4A"))
 
       Spacer()
@@ -171,7 +171,7 @@ struct ToolStatusRow: View {
         statusIcon
           .frame(width: 14, height: 14, alignment: .center)
         Text(tool.summary)
-          .font(.custom("Nunito", size: 12).weight(.semibold))
+          .font(.custom("Figtree", size: 12).weight(.semibold))
           .foregroundColor(textColor)
       }
 

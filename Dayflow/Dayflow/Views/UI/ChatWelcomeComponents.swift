@@ -27,7 +27,7 @@ struct WelcomeSuggestionRow: View {
           )
 
         Text(prompt.text)
-          .font(.custom("Nunito", size: 13).weight(.semibold))
+          .font(.custom("Figtree", size: 13).weight(.semibold))
           .foregroundColor(Color(hex: "5C432F"))
           .frame(maxWidth: .infinity, alignment: .leading)
           .multilineTextAlignment(.leading)
@@ -76,7 +76,7 @@ struct SuggestionChip: View {
   var body: some View {
     Button(action: action) {
       Text(text)
-        .font(.custom("Nunito", size: 12).weight(.medium))
+        .font(.custom("Figtree", size: 12).weight(.medium))
         .foregroundColor(Color(hex: "F96E00"))
         .padding(.horizontal, 14)
         .padding(.vertical, 8)
