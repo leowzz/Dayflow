@@ -43,12 +43,12 @@ extension DailyView {
 
         ZStack(alignment: .leading) {
           Text("Copy standup update")
-            .font(.custom("Nunito-Medium", size: 14 * scale))
+            .font(.custom("Figtree-Medium", size: 14 * scale))
             .lineLimit(1)
             .opacity(standupCopyState == .copied ? 0 : 1)
 
           Text("Copied")
-            .font(.custom("Nunito-Medium", size: 14 * scale))
+            .font(.custom("Figtree-Medium", size: 14 * scale))
             .lineLimit(1)
             .opacity(standupCopyState == .copied ? 1 : 0)
         }
@@ -109,12 +109,12 @@ extension DailyView {
 
         ZStack(alignment: .leading) {
           Text(regenerateButtonLabel)
-            .font(.custom("Nunito-Medium", size: 14 * scale))
+            .font(.custom("Figtree-Medium", size: 14 * scale))
             .lineLimit(1)
             .opacity(transientRegenerateButtonLabel == nil ? 1 : 0)
 
           Text(transientRegenerateButtonLabel ?? "")
-            .font(.custom("Nunito-Medium", size: 14 * scale))
+            .font(.custom("Figtree-Medium", size: 14 * scale))
             .lineLimit(1)
             .opacity(transientRegenerateButtonLabel == nil ? 0 : 1)
         }

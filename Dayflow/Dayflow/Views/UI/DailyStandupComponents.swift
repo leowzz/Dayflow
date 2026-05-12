@@ -150,7 +150,7 @@ struct DailyBulletCard: View {
                 .pointingHandCursorOnHover(reassertOnPressEnd: true)
 
               TextField("", text: bindingForItemText(id: itemID), axis: .vertical)
-                .font(.custom("Nunito-Regular", size: 14 * scale))
+                .font(.custom("Figtree-Regular", size: 14 * scale))
                 .foregroundStyle(Color.black)
                 .textFieldStyle(.plain)
                 .lineLimit(1...6)
@@ -216,7 +216,7 @@ struct DailyBulletCard: View {
           .frame(width: 18 * scale, height: 18 * scale)
 
         Text("Add item")
-          .font(.custom("Nunito-Regular", size: 13 * scale))
+          .font(.custom("Figtree-Regular", size: 13 * scale))
           .foregroundStyle(Color(hex: "999999"))
           .lineLimit(1)
       }
@@ -322,7 +322,7 @@ struct DailyBlockersSection: View {
   var body: some View {
     VStack(alignment: .leading, spacing: 8 * scale) {
       TextField("Blockers", text: $title)
-        .font(.custom("Nunito-Medium", size: 14 * scale))
+        .font(.custom("Figtree-Medium", size: 14 * scale))
         .foregroundStyle(Color(hex: "BD9479"))
         .textFieldStyle(.plain)
 
@@ -331,7 +331,7 @@ struct DailyBlockersSection: View {
           .frame(width: 18 * scale, height: 18 * scale)
 
         TextField("Fill in any blockers you may have", text: $prompt, axis: .vertical)
-          .font(.custom("Nunito-Regular", size: 14 * scale))
+          .font(.custom("Figtree-Regular", size: 14 * scale))
           .foregroundStyle(Color(hex: "929292"))
           .textFieldStyle(.plain)
           .lineLimit(1...4)

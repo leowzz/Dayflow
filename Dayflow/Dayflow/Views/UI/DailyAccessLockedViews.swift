@@ -22,7 +22,7 @@ struct DailyAccessIntroView: View {
       DailyAccessHeaderView()
 
       Text(betaNoticeCopy)
-        .font(.custom("Nunito-Regular", size: 15))
+        .font(.custom("Figtree-Regular", size: 15))
         .foregroundColor(Color(red: 0.35, green: 0.22, blue: 0.12).opacity(0.8))
         .multilineTextAlignment(.center)
         .frame(maxWidth: 480)
@@ -115,7 +115,7 @@ struct DailyProviderOnboardingView: View {
           Text(
             "Choose how Daily generates your recap, or turn generation off. You can change this later."
           )
-          .font(.custom("Nunito-Regular", size: 13))
+          .font(.custom("Figtree-Regular", size: 13))
           .foregroundColor(Color(red: 0.35, green: 0.22, blue: 0.12).opacity(0.8))
           .multilineTextAlignment(.center)
           .frame(maxWidth: 420)
@@ -143,11 +143,11 @@ struct DailyProviderOnboardingView: View {
               HStack(alignment: .top, spacing: 10) {
                 VStack(alignment: .leading, spacing: 3) {
                   Text(provider.displayName)
-                    .font(.custom("Nunito-SemiBold", size: 13))
+                    .font(.custom("Figtree-SemiBold", size: 13))
                     .foregroundStyle(Color(hex: isSelected ? "8F522C" : "2F241D"))
 
                   Text(availability.detail)
-                    .font(.custom("Nunito-Regular", size: 11))
+                    .font(.custom("Figtree-Regular", size: 11))
                     .foregroundStyle(Color(hex: availability.isAvailable ? "8B6B59" : "B07A74"))
                     .multilineTextAlignment(.leading)
                 }
@@ -189,7 +189,7 @@ struct DailyProviderOnboardingView: View {
           action: onContinue,
           content: {
             Text("Continue to Daily")
-              .font(.custom("Nunito", size: 14))
+              .font(.custom("Figtree", size: 14))
               .fontWeight(.semibold)
           },
           background: Color(red: 0.25, green: 0.17, blue: 0),
@@ -236,7 +236,7 @@ private struct DailyAccessHeaderView: View {
         .foregroundColor(Color(red: 0.35, green: 0.22, blue: 0.12))
 
       Text("BETA")
-        .font(.custom("Nunito-Bold", size: 11))
+        .font(.custom("Figtree-Bold", size: 11))
         .foregroundColor(.white)
         .padding(.horizontal, 8)
         .padding(.vertical, 4)
@@ -294,7 +294,7 @@ private struct DailyAnimatedRequestAccessButton: View {
 
         ZStack {
           Text("Unlock Daily")
-            .font(.custom("Nunito", size: 15))
+            .font(.custom("Figtree", size: 15))
             .fontWeight(.semibold)
             .foregroundColor(.white)
             .opacity(requestState == .idle ? 1 : 0)
@@ -304,7 +304,7 @@ private struct DailyAnimatedRequestAccessButton: View {
             Image(systemName: "checkmark.circle.fill")
               .font(.system(size: 14, weight: .semibold))
             Text("Daily Unlocked")
-              .font(.custom("Nunito", size: 15))
+              .font(.custom("Figtree", size: 15))
               .fontWeight(.semibold)
           }
           .foregroundColor(.white)
@@ -342,13 +342,13 @@ private struct DailyNotificationPermissionPanelView: View {
         .multilineTextAlignment(.center)
 
       Text("Dayflow uses notifications to tell you when your recap is ready.")
-        .font(.custom("Nunito-SemiBold", size: 16))
+        .font(.custom("Figtree-SemiBold", size: 16))
         .foregroundColor(Color(red: 0.25, green: 0.15, blue: 0.10))
         .multilineTextAlignment(.center)
         .frame(maxWidth: 420)
 
       Text(notificationPermissionMessage)
-        .font(.custom("Nunito-Regular", size: 14))
+        .font(.custom("Figtree-Regular", size: 14))
         .foregroundColor(Color(red: 0.35, green: 0.22, blue: 0.12).opacity(0.8))
         .multilineTextAlignment(.center)
         .frame(maxWidth: 430)
@@ -358,7 +358,7 @@ private struct DailyNotificationPermissionPanelView: View {
           action: onNotificationPermissionAction,
           content: {
             Text(notificationPermissionButtonTitle)
-              .font(.custom("Nunito", size: 15))
+              .font(.custom("Figtree", size: 15))
               .fontWeight(.semibold)
           },
           background: Color(red: 0.25, green: 0.17, blue: 0),
@@ -376,7 +376,7 @@ private struct DailyNotificationPermissionPanelView: View {
           action: onRecheckPermissions,
           content: {
             Text("Recheck permissions")
-              .font(.custom("Nunito", size: 14))
+              .font(.custom("Figtree", size: 14))
               .fontWeight(.semibold)
           },
           background: .white.opacity(0.9),

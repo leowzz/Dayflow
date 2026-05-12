@@ -266,7 +266,7 @@ extension DailyView {
           ? "\(totalTitle)  No captured activity yet."
           : "\(totalTitle)  No captured activity during 9am-9pm"
         Text(emptyDescription)
-          .font(.custom("Nunito-Regular", size: 12 * scale))
+          .font(.custom("Figtree-Regular", size: 12 * scale))
           .foregroundStyle(Color(hex: "7F7062"))
       } else {
         HStack(spacing: 8 * scale) {
@@ -277,10 +277,10 @@ extension DailyView {
           ForEach(workflowTotals) { total in
             HStack(spacing: 2 * scale) {
               Text(total.name)
-                .font(.custom("Nunito-Regular", size: 12 * scale))
+                .font(.custom("Figtree-Regular", size: 12 * scale))
                 .foregroundStyle(Color(hex: "1F1B18"))
               Text(formatDuration(minutes: total.minutes))
-                .font(.custom("Nunito-SemiBold", size: 12 * scale))
+                .font(.custom("Figtree-SemiBold", size: 12 * scale))
                 .foregroundStyle(Color(hex: total.colorHex))
             }
           }

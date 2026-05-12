@@ -78,13 +78,13 @@ struct DailyWorkflowGrid: View {
           VStack(alignment: .trailing, spacing: rowSpacing) {
             ForEach(renderRows) { row in
               Text(row.name)
-                .font(.custom("Nunito-Regular", size: categoryLabelFontSize))
+                .font(.custom("Figtree-Regular", size: categoryLabelFontSize))
                 .foregroundStyle(Color.black.opacity(0.9))
                 .frame(width: effectiveLabelWidth, height: cellSize, alignment: .trailing)
             }
             if showDistractions {
               Text("Distractions")
-                .font(.custom("Nunito-Regular", size: categoryLabelFontSize))
+                .font(.custom("Figtree-Regular", size: categoryLabelFontSize))
                 .foregroundStyle(Color.black.opacity(0.9))
                 .frame(
                   width: effectiveLabelWidth, height: distractionRowHeight, alignment: .trailing
@@ -183,7 +183,7 @@ struct DailyWorkflowGrid: View {
                     ForEach(Array(hourTicks.enumerated()), id: \.offset) { index, hour in
                       let tickX = CGFloat(index) * intervalWidth
                       Text(formatAxisHourLabel(fromAbsoluteHour: hour))
-                        .font(.custom("Nunito-Regular", size: axisLabelFontSize))
+                        .font(.custom("Figtree-Regular", size: axisLabelFontSize))
                         .kerning(-0.08 * layoutScale)
                         .foregroundStyle(Color.black.opacity(0.78))
                         .frame(
@@ -207,7 +207,7 @@ struct DailyWorkflowGrid: View {
                   .frame(width: axisWidth, alignment: .leading)
                 } else if let onlyTick = hourTicks.first {
                   Text(formatAxisHourLabel(fromAbsoluteHour: onlyTick))
-                    .font(.custom("Nunito-Regular", size: axisLabelFontSize))
+                    .font(.custom("Figtree-Regular", size: axisLabelFontSize))
                     .kerning(-0.08 * layoutScale)
                     .foregroundStyle(Color.black.opacity(0.78))
                     .frame(width: axisWidth, alignment: .leading)
@@ -361,7 +361,7 @@ func gridLabelColumnWidth(
 ) -> CGFloat {
   let fontSize = 12 * layoutScale
   let font =
-    NSFont(name: "Nunito-Regular", size: fontSize)
+    NSFont(name: "Figtree-Regular", size: fontSize)
     ?? NSFont.systemFont(ofSize: fontSize, weight: .regular)
   let measuredMax = rows.reduce(CGFloat.zero) { currentMax, row in
     let width = (row.name as NSString).size(withAttributes: [.font: font]).width
@@ -378,10 +378,10 @@ func workflowTooltip(
 ) -> some View {
   VStack(alignment: .leading, spacing: 4 * layoutScale) {
     Text(formatDurationValue(durationMinutes))
-      .font(.custom("Nunito-SemiBold", size: 12 * layoutScale))
+      .font(.custom("Figtree-SemiBold", size: 12 * layoutScale))
       .foregroundStyle(accentColor)
     Text(title)
-      .font(.custom("Nunito-Regular", size: 12 * layoutScale))
+      .font(.custom("Figtree-Regular", size: 12 * layoutScale))
       .foregroundStyle(Color.black)
       .fixedSize(horizontal: false, vertical: true)
   }
@@ -410,10 +410,10 @@ struct DailyStatChip: View {
   var body: some View {
     HStack(spacing: 4) {
       Text(title)
-        .font(.custom("Nunito-Regular", size: 10 * scale))
+        .font(.custom("Figtree-Regular", size: 10 * scale))
         .foregroundStyle(Color(hex: "5D5651"))
       Text(value)
-        .font(.custom("Nunito-SemiBold", size: 10 * scale))
+        .font(.custom("Figtree-SemiBold", size: 10 * scale))
         .foregroundStyle(Color(hex: "D77A43"))
     }
     .padding(.horizontal, 12 * scale)
@@ -466,7 +466,7 @@ struct DailyModeToggle: View {
     let fill = isActive ? Color(hex: "FFA767") : Color(hex: "FFFAF7").opacity(0.6)
 
     Text(text)
-      .font(.custom("Nunito-Regular", size: 14 * scale))
+      .font(.custom("Figtree-Regular", size: 14 * scale))
       .lineLimit(1)
       .foregroundStyle(isActive ? Color.white : Color(hex: "837870"))
       .padding(.horizontal, 12 * scale)

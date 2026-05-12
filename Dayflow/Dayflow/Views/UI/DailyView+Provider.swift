@@ -81,7 +81,7 @@ extension DailyView {
             .foregroundStyle(Color(hex: "2E221B"))
 
           Text("Choose how Daily generates this recap, or turn generation off.")
-            .font(.custom("Nunito-Regular", size: 12 * scale))
+            .font(.custom("Figtree-Regular", size: 12 * scale))
             .foregroundStyle(Color(hex: "8B6B59"))
         }
 
@@ -107,11 +107,11 @@ extension DailyView {
             HStack(alignment: .top, spacing: 10 * scale) {
               VStack(alignment: .leading, spacing: 2 * scale) {
                 Text(provider.displayName)
-                  .font(.custom("Nunito-SemiBold", size: 13 * scale))
+                  .font(.custom("Figtree-SemiBold", size: 13 * scale))
                   .foregroundStyle(Color(hex: isSelected ? "8F522C" : "2F241D"))
 
                 Text(availability.detail)
-                  .font(.custom("Nunito-Regular", size: 12 * scale))
+                  .font(.custom("Figtree-Regular", size: 12 * scale))
                   .foregroundStyle(Color(hex: availability.isAvailable ? "8B6B59" : "B07A74"))
                   .multilineTextAlignment(.leading)
               }

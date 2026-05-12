@@ -21,7 +21,7 @@ struct BugReportView: View {
         Text(
           "Email works great if you want to drop a quick note, Discord if you want to join the community, and if you’d prefer to chat, find some time on my calendar - I’d love to dig into why Dayflow is or isn’t working well for you."
         )
-        .font(.custom("Nunito", size: 16))
+        .font(.custom("Figtree", size: 16))
         .foregroundColor(.black.opacity(0.65))
         .multilineTextAlignment(.center)
         .fixedSize(horizontal: false, vertical: true)
@@ -30,7 +30,7 @@ struct BugReportView: View {
       VStack(spacing: 24) {
         VStack(spacing: 12) {
           Text("Reach out")
-            .font(.custom("Nunito", size: 14).weight(.medium))
+            .font(.custom("Figtree", size: 14).weight(.medium))
             .foregroundColor(.black.opacity(0.55))
             .textCase(.uppercase)
             .tracking(0.75)
@@ -43,7 +43,7 @@ struct BugReportView: View {
                   Image(systemName: "envelope.fill")
                     .font(.system(size: 18, weight: .semibold))
                   Text("Email")
-                    .font(.custom("Nunito", size: 16).weight(.semibold))
+                    .font(.custom("Figtree", size: 16).weight(.semibold))
                 }
               },
               background: Color.white,
@@ -65,7 +65,7 @@ struct BugReportView: View {
                     .aspectRatio(contentMode: .fit)
                     .frame(width: 22, height: 18)
                   Text("Join Discord")
-                    .font(.custom("Nunito", size: 16).weight(.semibold))
+                    .font(.custom("Figtree", size: 16).weight(.semibold))
                 }
               },
               background: Color.white,
@@ -84,7 +84,7 @@ struct BugReportView: View {
                   Image(systemName: "calendar.badge.clock")
                     .font(.system(size: 18, weight: .semibold))
                   Text("Calendar")
-                    .font(.custom("Nunito", size: 16).weight(.semibold))
+                    .font(.custom("Figtree", size: 16).weight(.semibold))
                 }
               },
               background: Color.white,
@@ -100,7 +100,7 @@ struct BugReportView: View {
 
         VStack(spacing: 12) {
           Text("Quick utilities")
-            .font(.custom("Nunito", size: 14).weight(.medium))
+            .font(.custom("Figtree", size: 14).weight(.medium))
             .foregroundColor(.black.opacity(0.55))
             .textCase(.uppercase)
             .tracking(0.75)
@@ -113,7 +113,7 @@ struct BugReportView: View {
                   Image(systemName: "doc.on.doc")
                     .font(.system(size: 16, weight: .semibold))
                   Text(didCopyEmail ? "Copied!" : "Copy email")
-                    .font(.custom("Nunito", size: 15).weight(.semibold))
+                    .font(.custom("Figtree", size: 15).weight(.semibold))
                 }
               },
               background: Color.white,
@@ -136,7 +136,7 @@ struct BugReportView: View {
                     didCopyDebugLogs
                       ? "Copied!" : (isCopyingDebugLogs ? "Preparing..." : "Copy debug logs")
                   )
-                  .font(.custom("Nunito", size: 15).weight(.semibold))
+                  .font(.custom("Figtree", size: 15).weight(.semibold))
                 }
               },
               background: Color.white,
