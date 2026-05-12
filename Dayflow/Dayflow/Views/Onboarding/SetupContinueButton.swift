@@ -25,7 +25,7 @@ struct SetupContinueButton: View {
     Button(action: isEnabled ? action : {}) {
       HStack(alignment: .center, spacing: 8) {
         Text(title)
-          .font(.custom("Nunito", size: 16))
+          .font(.custom("Figtree", size: 16))
           .fontWeight(.semibold)
           .foregroundColor(.white)
       }

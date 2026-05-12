@@ -542,7 +542,7 @@ struct WelcomeView: View {
 
           DayflowSurfaceButton(
             action: onStart,
-            content: { Text("Start").font(.custom("Nunito", size: 16)).fontWeight(.semibold) },
+            content: { Text("Start").font(.custom("Figtree", size: 16)).fontWeight(.semibold) },
             background: Color(red: 0.25, green: 0.17, blue: 0),
             foreground: .white,
             borderColor: .clear,
@@ -663,7 +663,7 @@ struct OnboardingPrototypeReferralStep: View {
         },
         content: {
           Text("Continue")
-            .font(.custom("Nunito", size: 14))
+            .font(.custom("Figtree", size: 14))
             .fontWeight(.semibold)
         },
         background: Color(hex: "402C00"),
@@ -706,7 +706,7 @@ struct CompletionView: View {
         Text(
           "To get useful insights, let Dayflow run in the background for an hour or two to gather enough context, then check back in."
         )
-        .font(.custom("Nunito", size: 15))
+        .font(.custom("Figtree", size: 15))
         .foregroundColor(.black.opacity(0.6))
         .multilineTextAlignment(.center)
         .fixedSize(horizontal: false, vertical: true)
@@ -718,7 +718,7 @@ struct CompletionView: View {
         },
         content: {
           Text("Launch Dayflow")
-            .font(.custom("Nunito", size: 16))
+            .font(.custom("Figtree", size: 16))
             .fontWeight(.semibold)
         },
         background: Color(red: 0.25, green: 0.17, blue: 0),

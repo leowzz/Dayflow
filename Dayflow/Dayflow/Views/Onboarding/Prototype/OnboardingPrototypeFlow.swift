@@ -373,11 +373,11 @@ struct OnboardingPrototypeRoleSelectionStep: View {
       VStack(spacing: 24) {
         VStack(spacing: 4) {
           Text("What do you do for work?")
-            .font(.custom("Nunito", size: 20))
+            .font(.custom("Figtree", size: 20))
             .foregroundColor(Color(hex: "89380E"))
 
           Text("This will help Dayflow generate categories that are most helpful to you.")
-            .font(.custom("Nunito", size: 20))
+            .font(.custom("Figtree", size: 20))
             .foregroundColor(Color(hex: "89380E"))
         }
         .multilineTextAlignment(.center)
@@ -399,11 +399,11 @@ struct OnboardingPrototypeRoleSelectionStep: View {
       if selectedRole == "Other" {
         VStack(spacing: 16) {
           Text("Please specify")
-            .font(.custom("Nunito", size: 20))
+            .font(.custom("Figtree", size: 20))
             .foregroundColor(Color(hex: "89380E"))
 
           TextField("", text: $otherText)
-            .font(.custom("Nunito", size: 16))
+            .font(.custom("Figtree", size: 16))
             .foregroundColor(Color(hex: "492304"))
             .textFieldStyle(.plain)
             .padding(.horizontal, 12)
@@ -433,7 +433,7 @@ struct OnboardingPrototypeRoleSelectionStep: View {
         },
         content: {
           Text("Continue")
-            .font(.custom("Nunito", size: 14))
+            .font(.custom("Figtree", size: 14))
             .fontWeight(.semibold)
         },
         background: Color(hex: "402C00"),
@@ -462,7 +462,7 @@ struct OnboardingPrototypeRoleSelectionStep: View {
       selectedRole = role
     } label: {
       Text(role)
-        .font(.custom("Nunito", size: 16))
+        .font(.custom("Figtree", size: 16))
         .foregroundColor(Color(hex: "492304"))
         .padding(.horizontal, 20)
         .padding(.vertical, 8)
@@ -502,7 +502,7 @@ struct OnboardingPrototypePreferencesStep: View {
 
       VStack(spacing: 24) {
         Text("Do you have a paid ChatGPT or Claude account?")
-          .font(.custom("Nunito", size: 20))
+          .font(.custom("Figtree", size: 20))
           .foregroundColor(Color(hex: "89380E"))
           .multilineTextAlignment(.center)
 
@@ -512,7 +512,7 @@ struct OnboardingPrototypePreferencesStep: View {
               onContinue(option == "Yes")
             } label: {
               Text(option)
-                .font(.custom("Nunito", size: 16))
+                .font(.custom("Figtree", size: 16))
                 .foregroundColor(Color(hex: "492304"))
                 .padding(.horizontal, 20)
                 .padding(.vertical, 8)
@@ -665,7 +665,7 @@ struct OnboardingPrototypeChooseProviderStep: View {
         }
       } label: {
         Text(showAllOptions ? "See recommendations only" : "See all options")
-          .font(.custom("Nunito", size: scaledText(16)))
+          .font(.custom("Figtree", size: scaledText(16)))
           .foregroundColor(Color(hex: "492304"))
           .padding(.horizontal, scaled(20))
           .padding(.vertical, scaled(8))
@@ -707,7 +707,7 @@ struct OnboardingPrototypeChooseProviderStep: View {
         HStack {
           Spacer()
           Text(title)
-            .font(.custom("Nunito", size: scaledText(18)))
+            .font(.custom("Figtree", size: scaledText(18)))
             .fontWeight(.semibold)
             .foregroundColor(.black.opacity(0.9))
           Spacer()
@@ -767,7 +767,7 @@ struct OnboardingPrototypeChooseProviderStep: View {
         HStack(spacing: scaled(12)) {
           ProviderIconView(icon: info.icon, scale: layoutScale)
           Text(info.title)
-            .font(.custom("Nunito", size: scaledText(18)))
+            .font(.custom("Figtree", size: scaledText(18)))
             .fontWeight(.semibold)
             .foregroundColor(.black.opacity(0.9))
             .lineLimit(1)
@@ -809,7 +809,7 @@ struct OnboardingPrototypeChooseProviderStep: View {
       action: { onSelect(title) },
       content: {
         Text("Select")
-          .font(.custom("Nunito", size: scaledText(14)))
+          .font(.custom("Figtree", size: scaledText(14)))
           .fontWeight(.semibold)
           .frame(maxWidth: .infinity)
       },
@@ -840,7 +840,7 @@ private struct OnboardingPrototypePlaceholderStep: View {
         Text(
           "The intro video, role-selection screen, and preferences screen are now wired up. We can keep replacing the remaining placeholders step by step without touching production onboarding yet."
         )
-        .font(.custom("Nunito", size: 17))
+        .font(.custom("Figtree", size: 17))
         .foregroundColor(.black.opacity(0.65))
         .multilineTextAlignment(.center)
         .frame(maxWidth: 620)
@@ -851,7 +851,7 @@ private struct OnboardingPrototypePlaceholderStep: View {
           action: onReplayVideo,
           content: {
             Text("Replay video")
-              .font(.custom("Nunito", size: 15))
+              .font(.custom("Figtree", size: 15))
               .fontWeight(.semibold)
           },
           background: .white,
@@ -868,7 +868,7 @@ private struct OnboardingPrototypePlaceholderStep: View {
           action: onFinish,
           content: {
             Text("Finish prototype")
-              .font(.custom("Nunito", size: 15))
+              .font(.custom("Figtree", size: 15))
               .fontWeight(.semibold)
           },
           background: Color(red: 0.25, green: 0.17, blue: 0),

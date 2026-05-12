@@ -109,7 +109,7 @@ struct SetupSidebarItem: View {
         .frame(width: 20, height: 20)  // Fixed frame for consistent centering
 
         Text(title)
-          .font(.custom("Nunito", size: 15))
+          .font(.custom("Figtree", size: 15))
           .fontWeight(isSelected ? .semibold : .medium)
           .foregroundColor(textColor)
 

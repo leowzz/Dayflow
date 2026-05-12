@@ -97,7 +97,7 @@ struct OnboardingLLMSelectionView: View {
                 .foregroundColor(.black.opacity(0.6))
             }
           }
-          .font(.custom("Nunito", size: 14))
+          .font(.custom("Figtree", size: 14))
           .multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity)

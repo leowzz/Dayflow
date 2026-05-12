@@ -33,7 +33,7 @@ struct ScreenRecordingPermissionView: View {
         // Left side — text and controls
         VStack(alignment: .leading, spacing: 10) {
           Text("Last step!")
-            .font(.custom("Nunito-Bold", size: 16))
+            .font(.custom("Figtree-Bold", size: 16))
             .foregroundColor(Color(hex: "F96E00"))
 
           Text("Permission")
@@ -41,7 +41,7 @@ struct ScreenRecordingPermissionView: View {
             .foregroundColor(.black)
 
           Text("Dayflow can help understand your day.")
-            .font(.custom("Nunito-Medium", size: 14))
+            .font(.custom("Figtree-Medium", size: 14))
             .foregroundColor(Color(hex: "5B5B5B"))
             .fixedSize(horizontal: false, vertical: true)
 
@@ -52,7 +52,7 @@ struct ScreenRecordingPermissionView: View {
                 .font(.system(size: 14))
                 .foregroundColor(privacyTextColor)
               Text("Dayflow is built to be private and secure.")
-                .font(.custom("Nunito-Bold", size: 14))
+                .font(.custom("Figtree-Bold", size: 14))
                 .foregroundColor(privacyTextColor)
                 .fixedSize(horizontal: false, vertical: true)
             }
@@ -60,11 +60,11 @@ struct ScreenRecordingPermissionView: View {
             Text(
               "Dayflow stores all recordings locally on your Mac, and can process everything privately on your device using local AI models."
             )
-            .font(.custom("Nunito-Medium", size: 14))
+            .font(.custom("Figtree-Medium", size: 14))
             .foregroundColor(privacyTextColor)
 
             Text("You are always in control — you can pause or turn off Dayflow whenever you like.")
-              .font(.custom("Nunito-Medium", size: 14))
+              .font(.custom("Figtree-Medium", size: 14))
               .foregroundColor(privacyTextColor)
           }
           .padding(16)
@@ -85,11 +85,11 @@ struct ScreenRecordingPermissionView: View {
               EmptyView()
             case .granted:
               Text("✓ Permission granted! Click Next to continue.")
-                .font(.custom("Nunito", size: 14))
+                .font(.custom("Figtree", size: 14))
                 .foregroundColor(.green)
             case .needsAction:
               Text("Turn on Screen Recording for Dayflow, then quit and reopen the app to finish.")
-                .font(.custom("Nunito", size: 14))
+                .font(.custom("Figtree", size: 14))
                 .foregroundColor(.orange)
             }
           }
@@ -106,7 +106,7 @@ struct ScreenRecordingPermissionView: View {
                       .progressViewStyle(CircularProgressViewStyle())
                   }
                   Text(isCheckingPermission ? "Checking..." : "Open System Settings")
-                    .font(.custom("Nunito-SemiBold", size: 12))
+                    .font(.custom("Figtree-SemiBold", size: 12))
                     .tracking(-0.48)
                     .foregroundColor(brownAccent)
                 }
@@ -139,7 +139,7 @@ struct ScreenRecordingPermissionView: View {
                 HStack(spacing: 12) {
                   Button(action: openSystemSettings) {
                     Text("Open System Settings")
-                      .font(.custom("Nunito-SemiBold", size: 12))
+                      .font(.custom("Figtree-SemiBold", size: 12))
                       .tracking(-0.48)
                       .foregroundColor(brownAccent)
                       .padding(12)
@@ -169,7 +169,7 @@ struct ScreenRecordingPermissionView: View {
 
                   Button(action: quitAndReopen) {
                     Text("Quit & Reopen")
-                      .font(.custom("Nunito-SemiBold", size: 12))
+                      .font(.custom("Figtree-SemiBold", size: 12))
                       .tracking(-0.48)
                       .foregroundColor(brownAccent)
                       .padding(12)
@@ -216,7 +216,7 @@ struct ScreenRecordingPermissionView: View {
       HStack(spacing: 15) {
         DayflowSurfaceButton(
           action: onBack,
-          content: { Text("Back").font(.custom("Nunito-Medium", size: 12)).tracking(-0.48) },
+          content: { Text("Back").font(.custom("Figtree-Medium", size: 12)).tracking(-0.48) },
           background: .white,
           foreground: Color(hex: "B6B6B6"),
           borderColor: Color(hex: "B6B6B6"),
@@ -229,7 +229,7 @@ struct ScreenRecordingPermissionView: View {
           action: {
             if permissionState == .granted { onNext() }
           },
-          content: { Text("Next").font(.custom("Nunito-Medium", size: 12)).tracking(-0.48) },
+          content: { Text("Next").font(.custom("Figtree-Medium", size: 12)).tracking(-0.48) },
           background: permissionState == .granted
             ? Color(hex: "402B00")
             : Color(hex: "402B00").opacity(0.3),

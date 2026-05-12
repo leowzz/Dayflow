@@ -89,19 +89,19 @@ struct OnboardingCategoryStepView: View {
         .padding(.bottom, 24)
 
       Text("Dayflow will organize your activities based on the categories you provide.")
-        .font(.custom("Nunito", size: 14).weight(.medium))
+        .font(.custom("Figtree", size: 14).weight(.medium))
         .foregroundColor(Color(hex: "5B5B5B"))
         .fixedSize(horizontal: false, vertical: true)
 
       Text(
         "Here are options tailored to your work to help you get started. Provide more personalized descriptions to help Dayflow better understand your actions."
       )
-      .font(.custom("Nunito", size: 14).weight(.medium))
+      .font(.custom("Figtree", size: 14).weight(.medium))
       .foregroundColor(Color(hex: "5B5B5B"))
       .fixedSize(horizontal: false, vertical: true)
 
       Text("You can customize or create new categories any time.")
-        .font(.custom("Nunito", size: 14).weight(.medium))
+        .font(.custom("Figtree", size: 14).weight(.medium))
         .foregroundColor(Color(hex: "5B5B5B"))
         .fixedSize(horizontal: false, vertical: true)
     }
@@ -133,7 +133,7 @@ struct OnboardingCategoryStepView: View {
       colorSwatch(hex: category.colorHex)
 
       TextField("Category name", text: $draftName)
-        .font(.custom("Nunito", size: 12).weight(.bold))
+        .font(.custom("Figtree", size: 12).weight(.bold))
         .textFieldStyle(.plain)
         .foregroundColor(.black)
 
@@ -190,7 +190,7 @@ struct OnboardingCategoryStepView: View {
       colorSwatch(hex: category.colorHex)
 
       Text(category.name)
-        .font(.custom("Nunito", size: 12).weight(.bold))
+        .font(.custom("Figtree", size: 12).weight(.bold))
         .foregroundColor(.black)
 
       Spacer()
@@ -269,7 +269,7 @@ struct OnboardingCategoryStepView: View {
       }
     } label: {
       Text("+ Add category")
-        .font(.custom("Nunito", size: 12).weight(.medium))
+        .font(.custom("Figtree", size: 12).weight(.medium))
         .foregroundColor(Color(hex: "2B2B2B"))
         .frame(maxWidth: .infinity)
         .padding(.horizontal, 10)
@@ -297,7 +297,7 @@ struct OnboardingCategoryStepView: View {
       // Back button (outlined)
       Button(action: onBack) {
         Text("Back")
-          .font(.custom("Nunito", size: 12).weight(.medium))
+          .font(.custom("Figtree", size: 12).weight(.medium))
           .tracking(-0.48)
           .foregroundColor(Color(hex: "B6B6B6"))
           .padding(.horizontal, 40)
@@ -326,7 +326,7 @@ struct OnboardingCategoryStepView: View {
         onNext()
       } label: {
         Text("Next")
-          .font(.custom("Nunito", size: 12).weight(.medium))
+          .font(.custom("Figtree", size: 12).weight(.medium))
           .tracking(-0.48)
           .foregroundColor(.white)
           .padding(.horizontal, 40)
