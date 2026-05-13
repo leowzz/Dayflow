@@ -74,12 +74,12 @@ struct SettingsSection<Content: View, Trailing: View>: View {
       HStack(alignment: .firstTextBaseline, spacing: 16) {
         VStack(alignment: .leading, spacing: 4) {
           Text(title)
-            .font(.custom("Nunito", size: 17))
+            .font(.custom("Figtree", size: 17))
             .fontWeight(.semibold)
             .foregroundColor(SettingsStyle.text)
           if let subtitle {
             Text(subtitle)
-              .font(.custom("Nunito", size: 12))
+              .font(.custom("Figtree", size: 12))
               .foregroundColor(SettingsStyle.secondary)
               .fixedSize(horizontal: false, vertical: true)
           }
@@ -130,13 +130,13 @@ struct SettingsRow<Trailing: View>: View {
       HStack(alignment: .center, spacing: 16) {
         VStack(alignment: .leading, spacing: 3) {
           Text(label)
-            .font(.custom("Nunito", size: 14))
+            .font(.custom("Figtree", size: 14))
             .fontWeight(.semibold)
             .foregroundColor(SettingsStyle.text)
             .fixedSize(horizontal: false, vertical: true)
           if let subtitle {
             Text(subtitle)
-              .font(.custom("Nunito", size: 12))
+              .font(.custom("Figtree", size: 12))
               .foregroundColor(SettingsStyle.secondary)
               .fixedSize(horizontal: false, vertical: true)
           }
@@ -194,7 +194,7 @@ struct SettingsPrimaryButton: View {
             .font(.system(size: 12, weight: .semibold))
         }
         Text(title)
-          .font(.custom("Nunito", size: 13))
+          .font(.custom("Figtree", size: 13))
           .fontWeight(.semibold)
       }
       .foregroundColor(.white)
@@ -225,7 +225,7 @@ struct SettingsSecondaryButton: View {
             .font(.system(size: 11, weight: .semibold))
         }
         Text(title)
-          .font(.custom("Nunito", size: 13))
+          .font(.custom("Figtree", size: 13))
           .fontWeight(.semibold)
       }
       .foregroundColor(SettingsStyle.ink.opacity(isDisabled ? 0.4 : 1))
@@ -251,7 +251,7 @@ struct SettingsLinkButton: View {
     Button(action: action) {
       HStack(spacing: 5) {
         Text(title)
-          .font(.custom("Nunito", size: 13))
+          .font(.custom("Figtree", size: 13))
           .fontWeight(.semibold)
         if let systemImage {
           Image(systemName: systemImage)
@@ -307,7 +307,7 @@ struct SettingsStatusDot: View {
         .fill(color)
         .frame(width: 8, height: 8)
       Text(label)
-        .font(.custom("Nunito", size: 13))
+        .font(.custom("Figtree", size: 13))
         .fontWeight(.semibold)
         .foregroundColor(color)
     }
@@ -349,7 +349,7 @@ struct SettingsBadge: View {
 
   var body: some View {
     Text(text)
-      .font(.custom("Nunito", size: 10))
+      .font(.custom("Figtree", size: 10))
       .fontWeight(.bold)
       .kerning(0.6)
       .foregroundColor(isAccent ? SettingsStyle.ink : SettingsStyle.secondary)
@@ -372,7 +372,7 @@ struct SettingsMetadata: View {
   let text: String
   var body: some View {
     Text(text)
-      .font(.custom("Nunito", size: 13))
+      .font(.custom("Figtree", size: 13))
       .foregroundColor(SettingsStyle.secondary)
   }
 }

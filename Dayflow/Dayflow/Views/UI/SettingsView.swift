@@ -185,7 +185,7 @@ struct SettingsView: View {
     let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? ""
     return VStack(alignment: .leading, spacing: 8) {
       Text("Dayflow v\(version)")
-        .font(.custom("Nunito", size: 11))
+        .font(.custom("Figtree", size: 11))
         .foregroundColor(.black.opacity(0.4))
 
       Button {
@@ -193,7 +193,7 @@ struct SettingsView: View {
       } label: {
         HStack(spacing: 4) {
           Text("Release notes")
-            .font(.custom("Nunito", size: 11))
+            .font(.custom("Figtree", size: 11))
             .fontWeight(.semibold)
           Image(systemName: "arrow.up.right")
             .font(.system(size: 9, weight: .semibold))
@@ -212,7 +212,7 @@ struct SettingsView: View {
       }
     } label: {
       Text(tab.title)
-        .font(.custom("Nunito", size: 13))
+        .font(.custom("Figtree", size: 13))
         .fontWeight(.semibold)
         .foregroundColor(.black.opacity(selectedTab == tab ? 0.9 : 0.55))
         .frame(maxWidth: .infinity, alignment: .leading)

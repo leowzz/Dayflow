@@ -17,7 +17,7 @@ struct SettingsAccountSection: View {
 
       if let errorText = authManager.errorText {
         Text(errorText)
-          .font(.custom("Nunito", size: 11))
+          .font(.custom("Figtree", size: 11))
           .foregroundColor(SettingsStyle.destructive)
           .textSelection(.enabled)
       }
@@ -135,7 +135,7 @@ struct SettingsAccountSection: View {
 
           VStack(alignment: .leading, spacing: 4) {
             Text("Cancel any time. No-questions-asked refunds.")
-              .font(.custom("Nunito", size: 12))
+              .font(.custom("Figtree", size: 12))
               .foregroundColor(SettingsStyle.secondary)
               .fixedSize(horizontal: false, vertical: true)
 
@@ -263,7 +263,7 @@ private struct ActiveProCard: View {
         VStack(alignment: .leading, spacing: 5) {
           HStack(alignment: .firstTextBaseline, spacing: 10) {
             Text(title)
-              .font(.custom("Nunito", size: 22))
+              .font(.custom("Figtree", size: 22))
               .fontWeight(.bold)
               .foregroundColor(SettingsStyle.text)
 
@@ -271,7 +271,7 @@ private struct ActiveProCard: View {
           }
 
           Text(description)
-            .font(.custom("Nunito", size: 13))
+            .font(.custom("Figtree", size: 13))
             .foregroundColor(SettingsStyle.secondary)
             .fixedSize(horizontal: false, vertical: true)
         }
@@ -334,13 +334,13 @@ private struct ActiveProInfoTile: View {
   var body: some View {
     VStack(alignment: .leading, spacing: 5) {
       Text(label.uppercased())
-        .font(.custom("Nunito", size: 10))
+        .font(.custom("Figtree", size: 10))
         .fontWeight(.bold)
         .kerning(0.5)
         .foregroundColor(SettingsStyle.meta)
 
       Text(value)
-        .font(.custom("Nunito", size: 14))
+        .font(.custom("Figtree", size: 14))
         .fontWeight(.semibold)
         .foregroundColor(SettingsStyle.text)
         .lineLimit(1)
@@ -373,7 +373,7 @@ private struct BillingPlanCard: View {
       VStack(alignment: .leading, spacing: 12) {
         HStack(alignment: .firstTextBaseline, spacing: 8) {
           Text(title)
-            .font(.custom("Nunito", size: 13))
+            .font(.custom("Figtree", size: 13))
             .fontWeight(.bold)
             .foregroundColor(SettingsStyle.text)
 
@@ -389,13 +389,13 @@ private struct BillingPlanCard: View {
             .font(.custom("InstrumentSerif-Regular", size: 38))
             .foregroundColor(SettingsStyle.text)
           Text(cadence)
-            .font(.custom("Nunito", size: 13))
+            .font(.custom("Figtree", size: 13))
             .fontWeight(.semibold)
             .foregroundColor(SettingsStyle.secondary)
         }
 
         Text(note)
-          .font(.custom("Nunito", size: 12))
+          .font(.custom("Figtree", size: 12))
           .foregroundColor(SettingsStyle.secondary)
           .fixedSize(horizontal: false, vertical: true)
       }
@@ -433,7 +433,7 @@ private struct ProFeatureList: View {
             .padding(.top, 1)
 
           Text(feature)
-            .font(.custom("Nunito", size: 12))
+            .font(.custom("Figtree", size: 12))
             .foregroundColor(SettingsStyle.text)
             .fixedSize(horizontal: false, vertical: true)
         }
@@ -478,7 +478,7 @@ private struct DayflowSignInSheet: View {
 
       if let errorText = authManager.errorText {
         Text(errorText)
-          .font(.custom("Nunito", size: 12))
+          .font(.custom("Figtree", size: 12))
           .foregroundColor(SettingsStyle.destructive)
           .textSelection(.enabled)
       }
@@ -508,7 +508,7 @@ private struct DayflowSignInSheet: View {
           ? "Enter your email and Dayflow will send a 6 digit code."
           : "Enter the code sent to \(verificationEmail ?? authManager.pendingEmail ?? emailAddressTrimmed)."
       )
-      .font(.custom("Nunito", size: 13))
+      .font(.custom("Figtree", size: 13))
       .foregroundColor(SettingsStyle.secondary)
       .fixedSize(horizontal: false, vertical: true)
     }
@@ -518,7 +518,7 @@ private struct DayflowSignInSheet: View {
     VStack(alignment: .leading, spacing: 14) {
       TextField("you@example.com", text: $emailAddress)
         .textFieldStyle(.roundedBorder)
-        .font(.custom("Nunito", size: 14))
+        .font(.custom("Figtree", size: 14))
         .focused($focusedField, equals: .email)
         .disabled(authManager.isBusy)
         .onSubmit { sendCode() }
