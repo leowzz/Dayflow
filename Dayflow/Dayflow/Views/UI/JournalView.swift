@@ -70,7 +70,7 @@ struct JournalView: View {
 
         // BETA badge
         Text("BETA")
-          .font(.custom("Nunito-Bold", size: 11))
+          .font(.custom("Figtree-Bold", size: 11))
           .foregroundColor(.white)
           .padding(.horizontal, 8)
           .padding(.vertical, 4)
@@ -84,7 +84,7 @@ struct JournalView: View {
 
       // Subtitle
       Text(betaNoticeCopy)
-        .font(.custom("Nunito-Regular", size: 15))
+        .font(.custom("Figtree-Regular", size: 15))
         .foregroundColor(Color(red: 0.35, green: 0.22, blue: 0.12).opacity(0.8))
         .multilineTextAlignment(.center)
         .frame(maxWidth: 480)
@@ -125,13 +125,13 @@ struct JournalView: View {
       VStack(spacing: 16) {
         // Title
         Text("Enter access code")
-          .font(.custom("Nunito-SemiBold", size: 20))
+          .font(.custom("Figtree-SemiBold", size: 20))
           .foregroundColor(Color(red: 0.85, green: 0.45, blue: 0.25))
 
         // Text field
         TextField("", text: $accessCode)
           .textFieldStyle(.plain)
-          .font(.custom("Nunito-Medium", size: 15))
+          .font(.custom("Figtree-Medium", size: 15))
           .foregroundColor(Color(red: 0.25, green: 0.15, blue: 0.10))
           .multilineTextAlignment(.center)
           .padding(.horizontal, 14)
@@ -147,7 +147,7 @@ struct JournalView: View {
         // Submit button
         Button(action: validateCode) {
           Text("Get early access")
-            .font(.custom("Nunito-SemiBold", size: 15))
+            .font(.custom("Figtree-SemiBold", size: 15))
             .foregroundColor(Color(red: 0.35, green: 0.22, blue: 0.12))
             .padding(.horizontal, 28)
             .padding(.vertical, 10)
@@ -238,7 +238,7 @@ private struct JournalOnboardingView: View {
       Text(
         "Dayflow helps you track your daily and longer term goals, gives you the space to reflect, and generates a summary of each day."
       )
-      .font(.custom("Nunito-Regular", size: 16))
+      .font(.custom("Figtree-Regular", size: 16))
       .foregroundColor(Color(red: 0.25, green: 0.15, blue: 0.10).opacity(0.8))
       .multilineTextAlignment(.center)
       .frame(maxWidth: 640)
@@ -249,7 +249,7 @@ private struct JournalOnboardingView: View {
       // Start onboarding button
       Button(action: onStartOnboarding) {
         Text("Start onboarding")
-          .font(.custom("Nunito-SemiBold", size: 16))
+          .font(.custom("Figtree-SemiBold", size: 16))
           .foregroundColor(Color(red: 0.35, green: 0.22, blue: 0.12))
           .padding(.horizontal, 32)
           .padding(.vertical, 12)

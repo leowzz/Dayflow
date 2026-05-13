@@ -60,7 +60,7 @@ extension AnyTransition {
 
 struct WetInkText: View {
   let text: String
-  var font: Font = .custom("Nunito-Regular", size: 15)
+  var font: Font = .custom("Figtree-Regular", size: 15)
   var color: Color = Color(red: 0.18, green: 0.11, blue: 0.06)
   var lineHeight: CGFloat = 5
 
@@ -117,7 +117,7 @@ struct WetInkText: View {
 struct JournalPillButtonStyle: ButtonStyle {
   var horizontalPadding: CGFloat = 18
   var verticalPadding: CGFloat = 9
-  var font: Font = .custom("Nunito-SemiBold", size: 16)
+  var font: Font = .custom("Figtree-SemiBold", size: 16)
 
   func makeBody(configuration: Configuration) -> some View {
     configuration.label
@@ -328,13 +328,13 @@ extension JournalDayView {
               .frame(width: 16, height: 16)
 
             Text("Set reminders")
-              .font(.custom("Nunito-SemiBold", size: 12))
+              .font(.custom("Figtree-SemiBold", size: 12))
               .foregroundStyle(JournalDayTokens.reminderText)
           }
         }
         .buttonStyle(
           JournalPillButtonStyle(
-            horizontalPadding: 12, verticalPadding: 6, font: .custom("Nunito-SemiBold", size: 12))
+            horizontalPadding: 12, verticalPadding: 6, font: .custom("Figtree-SemiBold", size: 12))
         )
         .padding(.trailing, 20)
       }
@@ -350,7 +350,7 @@ private struct JournalTextEditor: View {
   var minLines: Int = 3
   var autoFocus: Bool = false
 
-  private let font = NSFont(name: "Nunito-Regular", size: 15) ?? .systemFont(ofSize: 15)
+  private let font = NSFont(name: "Figtree-Regular", size: 15) ?? .systemFont(ofSize: 15)
   private let verticalInset: CGFloat = 4
   @State private var height: CGFloat = 0
 
@@ -358,7 +358,7 @@ private struct JournalTextEditor: View {
     ZStack(alignment: .topLeading) {
       if text.isEmpty {
         Text(placeholder)
-          .font(.custom("Nunito-Regular", size: 15))
+          .font(.custom("Figtree-Regular", size: 15))
           .foregroundStyle(JournalDayTokens.bodyText.opacity(0.45))
           .padding(.top, verticalInset)
           .padding(.leading, 4)
@@ -713,7 +713,7 @@ private struct JournalLeftCardView: View {
         }
         section("Notes for the day") {
           Text(notes.isEmpty ? "—" : notes)
-            .font(.custom("Nunito-Regular", size: 15))
+            .font(.custom("Figtree-Regular", size: 15))
             .foregroundStyle(
               notes.isEmpty ? JournalDayTokens.bodyText.opacity(0.4) : JournalDayTokens.bodyText)
         }
@@ -818,7 +818,7 @@ private struct ReflectionPromptCard: View {
       Text(
         "Return near the end of your day to reflect on your intentions. Let Dayflow generate a narrative summary based on the activities on your Timeline."
       )
-      .font(.custom("Nunito-Regular", size: 15))
+      .font(.custom("Figtree-Regular", size: 15))
       .foregroundStyle(JournalDayTokens.bodyText.opacity(0.65))
       .fixedSize(horizontal: false, vertical: true)
 
@@ -894,7 +894,7 @@ private struct ReflectionSavedCard: View {
       if hasReflections {
         ScrollView {
           Text(reflections)
-            .font(.custom("Nunito-Regular", size: 15))
+            .font(.custom("Figtree-Regular", size: 15))
             .foregroundStyle(JournalDayTokens.bodyText)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.top, 6)
@@ -902,7 +902,7 @@ private struct ReflectionSavedCard: View {
         }
       } else {
         Text("Return near the end of your day to reflect on your intentions.")
-          .font(.custom("Nunito-Regular", size: 15))
+          .font(.custom("Figtree-Regular", size: 15))
           .foregroundStyle(JournalDayTokens.bodyText.opacity(0.65))
       }
 
@@ -913,17 +913,18 @@ private struct ReflectionSavedCard: View {
         if isLoading {
           HStack(spacing: 8) {
             ProgressView().scaleEffect(0.8)
-            Text("Generating summary...").font(.custom("Nunito-Regular", size: 14)).foregroundStyle(
-              JournalDayTokens.bodyText.opacity(0.7))
+            Text("Generating summary...").font(.custom("Figtree-Regular", size: 14))
+              .foregroundStyle(
+                JournalDayTokens.bodyText.opacity(0.7))
           }
         } else if let error = errorMessage {
           VStack(alignment: .trailing, spacing: 8) {
-            Text(error).font(.custom("Nunito-Regular", size: 13)).foregroundStyle(
+            Text(error).font(.custom("Figtree-Regular", size: 13)).foregroundStyle(
               Color.red.opacity(0.8)
             ).multilineTextAlignment(.trailing)
             HStack(spacing: 12) {
               Button("Dismiss") { onDismissError?() }
-                .buttonStyle(.plain).font(.custom("Nunito-Regular", size: 13)).foregroundStyle(
+                .buttonStyle(.plain).font(.custom("Figtree-Regular", size: 13)).foregroundStyle(
                   JournalDayTokens.bodyText.opacity(0.6)
                 )
                 .pointingHandCursor()
@@ -936,7 +937,7 @@ private struct ReflectionSavedCard: View {
             .buttonStyle(JournalPillButtonStyle(horizontalPadding: 24, verticalPadding: 11))
         } else {
           Text("Need at least 1 hour of timeline activity to summarize")
-            .font(.custom("Nunito-Regular", size: 13))
+            .font(.custom("Figtree-Regular", size: 13))
             .foregroundStyle(JournalDayTokens.bodyText.opacity(0.5))
         }
       }
@@ -957,11 +958,11 @@ private struct SummaryCard: View {
           .foregroundStyle(JournalDayTokens.sectionHeader)
 
         if let summary {
-          WetInkText(text: summary, font: .custom("Nunito-Regular", size: 17))
+          WetInkText(text: summary, font: .custom("Figtree-Regular", size: 17))
             .fixedSize(horizontal: false, vertical: true)
         } else {
           Text("Summarizing your day recorded on your timeline…")
-            .font(.custom("Nunito-Regular", size: 15))
+            .font(.custom("Figtree-Regular", size: 15))
             .foregroundStyle(JournalDayTokens.bodyText.opacity(0.65))
         }
       }
@@ -973,12 +974,12 @@ private struct SummaryCard: View {
 
         if let reflections, !reflections.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
           Text(reflections)
-            .font(.custom("Nunito-Regular", size: 15))
+            .font(.custom("Figtree-Regular", size: 15))
             .foregroundStyle(JournalDayTokens.bodyText)
             .fixedSize(horizontal: false, vertical: true)
         } else {
           Text("Return near the end of your day to reflect on your intentions.")
-            .font(.custom("Nunito-Regular", size: 15))
+            .font(.custom("Figtree-Regular", size: 15))
             .foregroundStyle(JournalDayTokens.bodyText.opacity(0.65))
         }
       }
@@ -986,7 +987,7 @@ private struct SummaryCard: View {
       if let onRegenerate {
         Button(action: onRegenerate) {
           Text("Regenerate summary")
-            .font(.custom("Nunito-Regular", size: 13))
+            .font(.custom("Figtree-Regular", size: 13))
             .foregroundStyle(JournalDayTokens.sectionHeader)
         }
         .buttonStyle(.plain)
@@ -1013,20 +1014,20 @@ private struct IntroView: View {
       Text(
         "Dayflow helps you track your daily and longer term pursuits, gives you the space to reflect, and generates a summary of each day."
       )
-      .font(.custom("Nunito-Regular", size: 16))
+      .font(.custom("Figtree-Regular", size: 16))
       .foregroundStyle(JournalDayTokens.bodyText)
       .multilineTextAlignment(.center)
       .frame(maxWidth: 540)
 
       if isEnabled {
         Button(action: onTapCTA) {
-          Text(ctaTitle).font(.custom("Nunito-SemiBold", size: 17))
+          Text(ctaTitle).font(.custom("Figtree-SemiBold", size: 17))
         }
         .buttonStyle(JournalPillButtonStyle(horizontalPadding: 28, verticalPadding: 10))
         .padding(.top, 16)
       } else {
         Text("No journal entry for this day")
-          .font(.custom("Nunito-Regular", size: 14))
+          .font(.custom("Figtree-Regular", size: 14))
           .foregroundStyle(JournalDayTokens.bodyText.opacity(0.5))
           .padding(.top, 16)
       }
@@ -1046,7 +1047,7 @@ private struct SummaryView: View {
         .foregroundStyle(JournalDayTokens.sectionHeader)
 
       ScrollView(.vertical, showsIndicators: false) {
-        WetInkText(text: copy, font: .custom("Nunito-Regular", size: 17))
+        WetInkText(text: copy, font: .custom("Figtree-Regular", size: 17))
           .multilineTextAlignment(.leading)
           .frame(maxWidth: 640, alignment: .leading)
       }
@@ -1054,7 +1055,7 @@ private struct SummaryView: View {
 
       Button(action: onTapCTA) {
         Text("Set today's intentions")
-          .font(.custom("Nunito-SemiBold", size: 17))
+          .font(.custom("Figtree-SemiBold", size: 17))
       }
       .buttonStyle(JournalPillButtonStyle(horizontalPadding: 28, verticalPadding: 10))
       .padding(.top, 16)
@@ -1072,7 +1073,7 @@ private struct JournalDayBulletList: View {
       ForEach(items, id: \.self) { item in
         HStack(alignment: .top, spacing: 8) {
           Circle().fill(JournalDayTokens.bullet).frame(width: 6, height: 6).padding(.top, 6)
-          Text(item).font(.custom("Nunito-Regular", size: 15)).foregroundStyle(
+          Text(item).font(.custom("Figtree-Regular", size: 15)).foregroundStyle(
             JournalDayTokens.bodyText
           ).fixedSize(horizontal: false, vertical: true)
         }
@@ -1115,7 +1116,7 @@ private struct JournalDaySegmentedControl: View {
       ForEach(JournalDayViewPeriod.allCases) { option in
         Button(action: { selection = option }) {
           Text(option.rawValue)
-            .font(.custom("Nunito-Regular", size: 12))
+            .font(.custom("Figtree-Regular", size: 12))
             .tracking(-0.12)
             .foregroundStyle(
               selection == option ? Color.white : JournalDayTokens.segmentInactiveText

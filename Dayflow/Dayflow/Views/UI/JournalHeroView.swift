@@ -71,14 +71,14 @@ extension JournalHeroView {
 extension JournalHeroView {
   fileprivate var badgeHeader: some View {
     Text(summary.headline)
-      .font(.custom("Nunito-SemiBold", size: 30))
+      .font(.custom("Figtree-SemiBold", size: 30))
       .kerning(-0.4)
       .foregroundStyle(.clear)  // fill via gradient mask
       .overlay(
         JournalHeroTokens.badgeTextGradient
           .mask(
             Text(summary.headline)
-              .font(.custom("Nunito-SemiBold", size: 30))
+              .font(.custom("Figtree-SemiBold", size: 30))
               .kerning(-0.4)
           )
       )
@@ -135,7 +135,7 @@ private struct ReflectButton: View {
   var body: some View {
     Button(action: action) {
       Text(title)
-        .font(.custom("Nunito-SemiBold", size: 15))
+        .font(.custom("Figtree-SemiBold", size: 15))
     }
     .buttonStyle(JournalHeroPillButtonStyle())
   }

@@ -36,7 +36,7 @@ struct JournalWeeklyView: View {
           .foregroundStyle(JournalWeeklyTokens.primaryText.opacity(0.85))
 
         Text(summary.description)
-          .font(.custom("Nunito-Regular", size: 14))
+          .font(.custom("Figtree-Regular", size: 14))
           .foregroundStyle(JournalWeeklyTokens.secondaryText)
           .multilineTextAlignment(.center)
           .frame(maxWidth: 520)
@@ -94,7 +94,7 @@ struct JournalWeeklyView: View {
           }
 
           Text("Set reminders")
-            .font(.custom("Nunito-SemiBold", size: 13))
+            .font(.custom("Figtree-SemiBold", size: 13))
             .foregroundStyle(JournalWeeklyTokens.accentText)
         }
         .padding(.horizontal, 18)
@@ -181,7 +181,7 @@ private struct TimelineCanvas: View {
   private func dayNode(for timelinePoint: TimelinePoint) -> some View {
     VStack(spacing: 6) {
       Text(timelinePoint.day.label)
-        .font(.custom("Nunito-SemiBold", size: 13))
+        .font(.custom("Figtree-SemiBold", size: 13))
         .foregroundStyle(timelinePoint.day.isMuted ? JournalWeeklyTokens.secondaryText : .white)
         .frame(width: 28, height: 28)
         .background(
@@ -261,7 +261,7 @@ private struct JournalWeeklySegmentedControl: View {
       ForEach(options) { option in
         Button(action: { selection = option }) {
           Text(option.rawValue)
-            .font(.custom("Nunito-SemiBold", size: 13))
+            .font(.custom("Figtree-SemiBold", size: 13))
             .foregroundStyle(selection == option ? Color.white : JournalWeeklyTokens.secondaryText)
             .padding(.horizontal, 18)
             .padding(.vertical, 6)
@@ -291,7 +291,7 @@ private struct JournalWeeklyEntryCard: View {
   var body: some View {
     VStack(alignment: .leading, spacing: 14) {
       Text(entry.summary)
-        .font(.custom("Nunito-Regular", size: 14))
+        .font(.custom("Figtree-Regular", size: 14))
         .foregroundStyle(JournalWeeklyTokens.primaryText)
         .multilineTextAlignment(.leading)
 
