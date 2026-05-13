@@ -113,7 +113,7 @@ struct TimelineReviewOverlayBadge: View {
         VStack(spacing: 4) {
           TimelineReviewRatingIcon(rating: rating, size: 48)
           Text(rating.title)
-            .font(.custom("Nunito", size: 20).weight(.bold))
+            .font(.custom("Figtree", size: 20).weight(.bold))
             .foregroundColor(rating.overlayTextColor)
         }
         .frame(width: 140)
@@ -134,7 +134,7 @@ struct TimelineReviewCategoryPill: View {
     HStack(spacing: 4) {
       Circle().fill(color).frame(width: 8, height: 8)
       Text(name)
-        .font(.custom("Nunito", size: 10).weight(.bold))
+        .font(.custom("Figtree", size: 10).weight(.bold))
         .foregroundColor(Color(hex: "333333"))
     }
     .padding(.horizontal, 6)
@@ -150,7 +150,7 @@ struct TimelineReviewTimeRangePill: View {
 
   var body: some View {
     Text(timeRange)
-      .font(.custom("Nunito", size: 10).weight(.bold))
+      .font(.custom("Figtree", size: 10).weight(.bold))
       .foregroundColor(Color(hex: "656565"))
       .padding(.horizontal, 6)
       .padding(.vertical, 4)
@@ -180,7 +180,7 @@ struct TimelineReviewRatingRow: View {
       VStack(spacing: 6) {
         ZUndoIcon(size: 16)
         Text("Undo")
-          .font(.custom("Nunito", size: 12).weight(.medium))
+          .font(.custom("Figtree", size: 12).weight(.medium))
           .foregroundColor(Color(hex: "98806D"))
       }
     }
@@ -195,7 +195,7 @@ struct TimelineReviewRatingRow: View {
       VStack(spacing: 6) {
         TimelineReviewFooterIcon(rating: rating, size: 16)
         Text(rating.title)
-          .font(.custom("Nunito", size: 12).weight(.medium))
+          .font(.custom("Figtree", size: 12).weight(.medium))
           .foregroundColor(Color(hex: "98806D"))
       }
     }
@@ -210,7 +210,7 @@ struct ZUndoIcon: View {
     ZStack {
       RoundedRectangle(cornerRadius: 4).fill(Color(hex: "D6AB8A").opacity(0.7))
       Text("Z")
-        .font(.custom("Nunito", size: size * 0.525).weight(.bold))
+        .font(.custom("Figtree", size: size * 0.525).weight(.bold))
         .foregroundColor(.white)
     }
     .frame(width: size, height: size)
@@ -329,11 +329,11 @@ struct SummaryLabelRow: View {
           HStack(spacing: 4) {
             TimelineReviewRatingIcon(rating: rating, size: 16)
             Text(rating.title)
-              .font(.custom("Nunito", size: 12).weight(.regular))
+              .font(.custom("Figtree", size: 12).weight(.regular))
               .foregroundColor(rating.labelColor)
           }
           Text(formatDuration(duration))
-            .font(.custom("Nunito", size: 16).weight(.semibold))
+            .font(.custom("Figtree", size: 16).weight(.semibold))
             .foregroundColor(Color(hex: "333333"))
             .padding(.leading, 18)
         }

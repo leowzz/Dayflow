@@ -86,7 +86,7 @@ struct TimelineRateSummaryView: View {
 
       HStack(spacing: 8) {
         Text(title)
-          .font(Font.custom("Nunito", size: 12).weight(.medium))
+          .font(Font.custom("Figtree", size: 12).weight(.medium))
           .foregroundColor(
             Color(red: 0.49, green: 0.47, blue: 0.46)
               .opacity(isEnabled ? 0.95 : 0.45)
@@ -139,11 +139,11 @@ struct TimelineRateSummaryView: View {
             .transition(transition)
         } else if deleteButtonState == .confirming {
           Text("Confirm")
-            .font(Font.custom("Nunito", size: 12).weight(.medium))
+            .font(Font.custom("Figtree", size: 12).weight(.medium))
             .transition(transition)
         } else {
           Text("Delete")
-            .font(Font.custom("Nunito", size: 12).weight(.medium))
+            .font(Font.custom("Figtree", size: 12).weight(.medium))
             .transition(transition)
         }
       }

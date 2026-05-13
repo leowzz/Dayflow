@@ -131,7 +131,7 @@ struct TimelineFeedbackModal: View {
           .multilineTextAlignment(.center)
 
         Text(content.formSubtitle)
-          .font(Font.custom("Nunito", size: 13).weight(.medium))
+          .font(Font.custom("Figtree", size: 13).weight(.medium))
           .foregroundColor(Color(hex: "333333"))
           .multilineTextAlignment(.center)
       }
@@ -139,7 +139,7 @@ struct TimelineFeedbackModal: View {
       VStack(spacing: 8) {
         ZStack(alignment: .topLeading) {
           TextEditor(text: $message)
-            .font(Font.custom("Nunito", size: 12).weight(.medium))
+            .font(Font.custom("Figtree", size: 12).weight(.medium))
             .foregroundColor(Color(hex: "333333"))
             .padding(.horizontal, 6)
             .padding(.vertical, 8)
@@ -160,7 +160,7 @@ struct TimelineFeedbackModal: View {
 
           if message.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
             Text(content.placeholder)
-              .font(Font.custom("Nunito", size: 12).weight(.medium))
+              .font(Font.custom("Figtree", size: 12).weight(.medium))
               .foregroundColor(Color(hex: "AAAAAA"))
               .padding(.horizontal, 12)
               .padding(.vertical, 12)
@@ -186,7 +186,7 @@ struct TimelineFeedbackModal: View {
               )
 
             Text(content.shareLogsLabel)
-              .font(Font.custom("Nunito", size: 10).weight(.medium))
+              .font(Font.custom("Figtree", size: 10).weight(.medium))
               .foregroundColor(Color.black)
               .fixedSize(horizontal: false, vertical: true)
           }
@@ -199,7 +199,7 @@ struct TimelineFeedbackModal: View {
 
       Button(action: onSubmit) {
         Text(content.submitButtonTitle)
-          .font(Font.custom("Nunito", size: 12).weight(.medium))
+          .font(Font.custom("Figtree", size: 12).weight(.medium))
           .foregroundColor(.white)
           .frame(maxWidth: .infinity)
           .frame(height: 30)
@@ -222,7 +222,7 @@ struct TimelineFeedbackModal: View {
       VStack(alignment: .leading, spacing: 12) {
         if let thanksBody = content.thanksBody {
           Text(thanksBody)
-            .font(Font.custom("Nunito", size: 12).weight(.medium))
+            .font(Font.custom("Figtree", size: 12).weight(.medium))
             .foregroundColor(Color(hex: "333333"))
             .multilineTextAlignment(.leading)
         }

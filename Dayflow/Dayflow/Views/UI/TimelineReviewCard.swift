@@ -112,7 +112,7 @@ struct TimelineReviewCard: View {
 
           ScrollView(.vertical, showsIndicators: true) {
             Text(summaryText)
-              .font(.custom("Nunito", size: 14).weight(.medium))
+              .font(.custom("Figtree", size: 14).weight(.medium))
               .foregroundColor(Color(hex: "333333"))
               .lineSpacing(3)
               .frame(maxWidth: .infinity, alignment: .leading)
@@ -125,7 +125,7 @@ struct TimelineReviewCard: View {
           HStack {
             Spacer()
             Text(progressText)
-              .font(.custom("Nunito", size: 10).weight(.medium))
+              .font(.custom("Figtree", size: 10).weight(.medium))
               .foregroundColor(Color(hex: "AFAFAF"))
           }
         }

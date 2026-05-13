@@ -217,7 +217,7 @@ struct TimelineReviewOverlay: View {
   private var reviewBottomContent: some View {
     VStack(spacing: 14) {
       Text("Swipe on each card on your Timeline to review your day.")
-        .font(.custom("Nunito", size: 14).weight(.medium))
+        .font(.custom("Figtree", size: 14).weight(.medium))
         .foregroundColor(Color(hex: "98806D"))
         .lineLimit(1)
         .minimumScaleFactor(0.95)
@@ -239,7 +239,7 @@ struct TimelineReviewOverlay: View {
         Text(
           "You've reviewed all your activities so far.\nThe Timeline right panel will be updated with your rating."
         )
-        .font(.custom("Nunito", size: 16).weight(.medium))
+        .font(.custom("Figtree", size: 16).weight(.medium))
         .foregroundColor(Color(hex: "333333"))
         .multilineTextAlignment(.center)
       }
@@ -250,7 +250,7 @@ struct TimelineReviewOverlay: View {
         dismissOverlay()
       } label: {
         Text("Close")
-          .font(.custom("Nunito", size: 14).weight(.semibold))
+          .font(.custom("Figtree", size: 14).weight(.semibold))
           .foregroundColor(Color(hex: "333333"))
           .padding(.horizontal, 24)
           .padding(.vertical, 10)
@@ -280,7 +280,7 @@ struct TimelineReviewOverlay: View {
         .font(.custom("InstrumentSerif-Regular", size: 28))
         .foregroundColor(Color(hex: "333333"))
       Text("Come back after a few timeline cards appear.")
-        .font(.custom("Nunito", size: 14).weight(.medium))
+        .font(.custom("Figtree", size: 14).weight(.medium))
         .foregroundColor(Color(hex: "707070"))
     }
   }

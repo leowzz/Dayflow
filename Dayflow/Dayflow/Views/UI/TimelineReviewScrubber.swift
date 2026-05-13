@@ -56,7 +56,7 @@ final class TimelineReviewScrubberNSView: NSView {
     layer?.addSublayer(pillLayer)
 
     textLayer.fontSize = 8
-    textLayer.font = NSFont(name: "Nunito-SemiBold", size: 8)
+    textLayer.font = NSFont(name: "Figtree-SemiBold", size: 8)
     textLayer.foregroundColor = NSColor.white.cgColor
     textLayer.alignmentMode = .center
     textLayer.isWrapped = false
