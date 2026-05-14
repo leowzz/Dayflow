@@ -52,6 +52,14 @@ struct SettingsOtherTabView: View {
         }
 
         SettingsRow(
+          label: "Show daily goal popups",
+          subtitle:
+            "When off, Dayflow won't automatically open goal setup or yesterday's review after 4am."
+        ) {
+          SettingsToggle(isOn: $viewModel.showDailyGoalPopups)
+        }
+
+        SettingsRow(
           label: "Save all timelapses to disk",
           subtitle:
             "New and reprocessed timeline cards will pre-generate timelapse videos and store them on disk instead of building them on demand. Uses more storage and background processing.",
