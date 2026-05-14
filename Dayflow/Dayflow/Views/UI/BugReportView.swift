@@ -2,7 +2,7 @@ import AppKit
 import SwiftUI
 
 struct BugReportView: View {
-  private let emailAddress = "liu.z.jerry@gmail.com"
+  private let emailAddress = "jerry@dayflow.so"
   private let discordInviteURL = URL(string: "https://discord.gg/9YPAtctE6k")
   private let callBookingURL = URL(string: "https://cal.com/jerry-liu/15min")
   @State private var didCopyEmail = false
