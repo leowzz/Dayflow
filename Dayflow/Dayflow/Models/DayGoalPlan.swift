@@ -7,6 +7,19 @@ enum DayGoalCategoryKind: String, CaseIterable, Sendable {
   case distraction
 }
 
+enum DayGoalPreferences {
+  static let showDailyGoalPopupsKey = "showDailyGoalPopups"
+
+  static var showDailyGoalPopups: Bool {
+    get {
+      UserDefaults.standard.object(forKey: showDailyGoalPopupsKey) as? Bool ?? true
+    }
+    set {
+      UserDefaults.standard.set(newValue, forKey: showDailyGoalPopupsKey)
+    }
+  }
+}
+
 struct DayGoalCategorySnapshot: Identifiable, Equatable, Sendable {
   let categoryID: String
   var name: String
@@ -45,6 +58,7 @@ struct DayGoalPlan: Equatable, Sendable {
   var distractionLimitMinutes: Int
   var focusCategories: [DayGoalCategorySnapshot]
   var distractionCategories: [DayGoalCategorySnapshot]
+  var isSkipped: Bool
   var createdAt: Int
   var updatedAt: Int
 
@@ -59,6 +73,7 @@ struct DayGoalPlan: Equatable, Sendable {
   func forDay(_ day: String) -> DayGoalPlan {
     var copy = self
     if copy.day != day {
+      copy.isSkipped = false
       copy.createdAt = 0
       copy.updatedAt = 0
     }
@@ -115,6 +130,7 @@ struct DayGoalPlan: Equatable, Sendable {
       distractionCategories: distraction.enumerated().map { index, category in
         DayGoalCategorySnapshot(category: category, sortOrder: index)
       },
+      isSkipped: false,
       createdAt: now,
       updatedAt: now
     )

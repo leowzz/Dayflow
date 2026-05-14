@@ -599,6 +599,7 @@ final class StorageManager: StorageManaging, @unchecked Sendable {
                   day TEXT NOT NULL PRIMARY KEY,
                   focus_target_minutes INTEGER NOT NULL,
                   distraction_limit_minutes INTEGER NOT NULL,
+                  is_skipped INTEGER NOT NULL DEFAULT 0,
                   created_at INTEGER NOT NULL,
                   updated_at INTEGER NOT NULL
               );
@@ -680,6 +681,15 @@ final class StorageManager: StorageManaging, @unchecked Sendable {
                 ALTER TABLE screenshots ADD COLUMN idle_seconds_at_capture INTEGER;
             """)
         print("✅ Added idle_seconds_at_capture column to screenshots")
+      }
+
+      let dayGoalColumns = try db.columns(in: "day_goals").map { $0.name }
+      if !dayGoalColumns.contains("is_skipped") {
+        try db.execute(
+          sql: """
+                ALTER TABLE day_goals ADD COLUMN is_skipped INTEGER NOT NULL DEFAULT 0;
+            """)
+        print("✅ Added is_skipped column to day_goals")
       }
     }
   }

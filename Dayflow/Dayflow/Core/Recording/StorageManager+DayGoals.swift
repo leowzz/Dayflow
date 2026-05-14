@@ -23,18 +23,21 @@ extension StorageManager {
       try db.execute(
         sql: """
               INSERT INTO day_goals(
-                  day, focus_target_minutes, distraction_limit_minutes, created_at, updated_at
+                  day, focus_target_minutes, distraction_limit_minutes, is_skipped,
+                  created_at, updated_at
               )
-              VALUES (?, ?, ?, ?, ?)
+              VALUES (?, ?, ?, ?, ?, ?)
               ON CONFLICT(day) DO UPDATE SET
                   focus_target_minutes = excluded.focus_target_minutes,
                   distraction_limit_minutes = excluded.distraction_limit_minutes,
+                  is_skipped = excluded.is_skipped,
                   updated_at = excluded.updated_at
           """,
         arguments: [
           plan.day,
           plan.focusTargetMinutes,
           plan.distractionLimitMinutes,
+          plan.isSkipped ? 1 : 0,
           createdAt,
           now,
         ])
@@ -61,7 +64,8 @@ extension StorageManager {
         let row = try Row.fetchOne(
           db,
           sql: """
-                SELECT day, focus_target_minutes, distraction_limit_minutes, created_at, updated_at
+                SELECT day, focus_target_minutes, distraction_limit_minutes, is_skipped,
+                       created_at, updated_at
                 FROM day_goals
                 WHERE \(whereSQL)
                 \(orderSQL)
@@ -107,12 +111,15 @@ extension StorageManager {
         }
       }
 
+      let isSkipped: Int = row["is_skipped"]
+
       return DayGoalPlan(
         day: day,
         focusTargetMinutes: row["focus_target_minutes"],
         distractionLimitMinutes: row["distraction_limit_minutes"],
         focusCategories: focusCategories,
         distractionCategories: distractionCategories,
+        isSkipped: isSkipped != 0,
         createdAt: row["created_at"],
         updatedAt: row["updated_at"]
       )
