@@ -32,13 +32,30 @@ struct ReleaseNote: Identifiable {
   }
 }
 
-enum WhatsNewProInterestOption: String, CaseIterable, Identifiable {
-  case definitely = "Yes, definitely"
-  case probably = "Probably"
-  case maybe = "Maybe, if the quality is clearly better"
-  case no = "No"
+enum WhatsNewTaskOption: String, CaseIterable, Identifiable {
+  case manualPlan = "manual_plan"
+  case importedTasks = "imported_tasks"
+  case progressReview = "progress_review"
+  case tomorrowPriorities = "tomorrow_priorities"
+  case timeTrackingOnly = "time_tracking_only"
 
   var id: String { rawValue }
+
+  var title: String {
+    switch self {
+    case .manualPlan:
+      return
+        "Let me write down what I want to get done, then automatically track progress from my day"
+    case .importedTasks:
+      return "Pull tasks from tools I already use, like Linear, Notion, Todoist, or my calendar"
+    case .progressReview:
+      return "Show me which planned tasks I actually made progress on"
+    case .tomorrowPriorities:
+      return "Carry unfinished work into tomorrow's priorities"
+    case .timeTrackingOnly:
+      return "Nothing; I want Dayflow to track my time, not manage my tasks"
+    }
+  }
 }
 
 // MARK: - What's New Configuration
@@ -53,10 +70,12 @@ enum WhatsNewConfiguration {
   static var configuredRelease: ReleaseNote? {
     ReleaseNote(
       version: targetVersion,
-      title: "Privacy controls for your timeline",
+      title: "Set goals for your day",
       highlights: [
-        "You can now choose specific apps Dayflow should hide from recording.",
-        "Open Settings -> Privacy and pick the apps you never want captured.",
+        "Dayflow is evolving from helping you understand your time to helping you improve how you spend it.",
+        "We're starting with daily focus targets: choose what counts as focus, set a distraction limit, and track your progress as the day unfolds.",
+        "Dayflow also has a cleaner visual system, with more readable text and a calmer, more consistent feel throughout the app.",
+        "Daily goal reminders can be turned off anytime in Settings.",
       ],
       previewIntro: nil,
       previewImageNames: [],
@@ -119,19 +138,16 @@ struct WhatsNewView: View {
   let onDismiss: () -> Void
 
   @Environment(\.openURL) private var openURL
-  @AppStorage("whatsNewProInterestSubmittedVersion") private var submittedProInterestVersion:
+  @AppStorage("whatsNewTaskOptionsSubmittedVersion") private var submittedTaskOptionsVersion:
     String = ""
-  @AppStorage("whatsNewProPriceSubmittedVersion") private var submittedProPriceVersion: String = ""
-  @State private var selectedProInterestOptionID = ""
-  @State private var proPriceResponse = ""
+  @State private var selectedTaskOptionIDs: Set<String> = []
   @State private var releaseSurveyResponseID = ""
-  @State private var isSubmittingProInterest = false
-  @State private var isSubmittingProPrice = false
+  @State private var isSubmittingTaskOptions = false
   @State private var surveyErrorText: String?
   @State private var didHydrateSurveyState = false
 
   private let bottomAnchorID = "whats_new_bottom_anchor"
-  private let releaseSurveyKey = "pro_pricing"
+  private let releaseSurveyKey = "task_planning"
 
   var body: some View {
     ScrollView {
