@@ -13,7 +13,7 @@ final class DailyRecapScheduler: @unchecked Sendable {
   private var isRunningCheck = false
 
   private let checkInterval: TimeInterval = 5 * 60
-  private let bootstrapBackfillWindowDays = 7
+  private let sourceLookbackWindowDays = 3
   private let priorStandupHistoryLimit = 3
 
   private init() {}
@@ -81,33 +81,25 @@ final class DailyRecapScheduler: @unchecked Sendable {
     }
 
     let currentDay = now.getDayInfoFor4AMBoundary()
-    guard
-      let yesterdayStart = Calendar.current.date(
-        byAdding: .day, value: -1, to: currentDay.startOfDay)
-    else {
-      AnalyticsService.shared.capture(
-        "daily_auto_generation_check_failed",
-        [
-          "reason": "day_calculation_failed",
-          "trigger": reason,
-        ])
+    let targetDay = currentDay.dayString
+
+    guard StorageManager.shared.fetchDailyStandup(forDay: targetDay) == nil else {
       return
     }
 
     let minimumActivityMinutes = 180
     guard
-      let recapTarget = nextRecapTargetDay(
-        fromYesterday: yesterdayStart,
-        minimumActivityMinutes: minimumActivityMinutes,
-        trigger: reason
+      let sourceDay = recapSourceDay(
+        before: currentDay.startOfDay,
+        minimumActivityMinutes: minimumActivityMinutes
       )
     else {
       return
     }
 
-    let recapDay = recapTarget.dayString
-    let recapStart = recapTarget.startOfDay
-    let recapEnd = recapTarget.endOfDay
+    let sourceDayString = sourceDay.dayString
+    let sourceStart = sourceDay.startOfDay
+    let sourceEnd = sourceDay.endOfDay
     let selectedProvider = DailyRecapGenerator.shared.selectedProvider()
     let providerAvailability =
       DailyRecapGenerator.shared.availabilitySnapshot()[selectedProvider]
@@ -128,7 +120,8 @@ final class DailyRecapScheduler: @unchecked Sendable {
         providerProps.merging(
           [
             "trigger": reason,
-            "target_day": recapDay,
+            "target_day": targetDay,
+            "source_day": sourceDayString,
             "reason": "no_provider_selected",
           ],
           uniquingKeysWith: { _, new in new }
@@ -142,7 +135,8 @@ final class DailyRecapScheduler: @unchecked Sendable {
         providerProps.merging(
           [
             "trigger": reason,
-            "target_day": recapDay,
+            "target_day": targetDay,
+            "source_day": sourceDayString,
             "reason": "provider_unavailable",
             "provider_detail": providerAvailability.detail,
           ],
@@ -153,24 +147,25 @@ final class DailyRecapScheduler: @unchecked Sendable {
 
     let usesDayflowInputs = selectedProvider.usesDayflowInputs
 
-    let cards = StorageManager.shared.fetchTimelineCards(forDay: recapDay)
+    let cards = StorageManager.shared.fetchTimelineCards(forDay: sourceDayString)
     let observations =
       usesDayflowInputs
       ? StorageManager.shared.fetchObservations(
-        startTs: Int(recapStart.timeIntervalSince1970),
-        endTs: Int(recapEnd.timeIntervalSince1970)
+        startTs: Int(sourceStart.timeIntervalSince1970),
+        endTs: Int(sourceEnd.timeIntervalSince1970)
       ) : []
     let priorEntries =
       usesDayflowInputs
       ? StorageManager.shared.fetchRecentDailyStandups(
         limit: priorStandupHistoryLimit,
-        excludingDay: recapDay
+        excludingDay: sourceDayString
       ) : []
 
-    let cardsText = DailyRecapGenerator.makeCardsText(day: recapDay, cards: cards)
+    let cardsText = DailyRecapGenerator.makeCardsText(day: sourceDayString, cards: cards)
     let observationsText =
       usesDayflowInputs
-      ? DailyRecapGenerator.makeObservationsText(day: recapDay, observations: observations) : ""
+      ? DailyRecapGenerator.makeObservationsText(day: sourceDayString, observations: observations)
+      : ""
     let priorDailyText =
       usesDayflowInputs ? DailyRecapGenerator.makePriorDailyText(entries: priorEntries) : ""
     let preferencesText =
@@ -185,7 +180,8 @@ final class DailyRecapScheduler: @unchecked Sendable {
       providerProps.merging(
         [
           "trigger": reason,
-          "target_day": recapDay,
+          "target_day": targetDay,
+          "source_day": sourceDayString,
         ],
         uniquingKeysWith: { _, new in new }
       ))
@@ -195,7 +191,8 @@ final class DailyRecapScheduler: @unchecked Sendable {
       providerProps.merging(
         [
           "trigger": reason,
-          "target_day": recapDay,
+          "target_day": targetDay,
+          "source_day": sourceDayString,
           "input_mode": usesDayflowInputs ? "cards_observations_prior" : "cards_only",
           "cards_count": cards.count,
           "observations_count": observations.count,
@@ -211,8 +208,8 @@ final class DailyRecapScheduler: @unchecked Sendable {
     let startedAt = Date()
     do {
       let context = DailyRecapGenerationContext(
-        targetDayString: recapDay,
-        sourceDayString: recapDay,
+        targetDayString: targetDay,
+        sourceDayString: sourceDayString,
         cards: cards,
         observations: observations,
         priorEntries: priorEntries,
@@ -227,7 +224,8 @@ final class DailyRecapScheduler: @unchecked Sendable {
           providerProps.merging(
             [
               "trigger": reason,
-              "target_day": recapDay,
+              "target_day": targetDay,
+              "source_day": sourceDayString,
               "failure_reason": "payload_encoding_failed",
             ],
             uniquingKeysWith: { _, new in new }
@@ -235,14 +233,15 @@ final class DailyRecapScheduler: @unchecked Sendable {
         return
       }
 
-      StorageManager.shared.saveDailyStandup(forDay: recapDay, payloadJSON: payloadJSON)
-      guard StorageManager.shared.fetchDailyStandup(forDay: recapDay) != nil else {
+      StorageManager.shared.saveDailyStandup(forDay: targetDay, payloadJSON: payloadJSON)
+      guard StorageManager.shared.fetchDailyStandup(forDay: targetDay) != nil else {
         AnalyticsService.shared.capture(
           "daily_auto_generation_failed",
           providerProps.merging(
             [
               "trigger": reason,
-              "target_day": recapDay,
+              "target_day": targetDay,
+              "source_day": sourceDayString,
               "failure_reason": "db_save_verification_failed",
             ],
             uniquingKeysWith: { _, new in new }
@@ -254,7 +253,8 @@ final class DailyRecapScheduler: @unchecked Sendable {
         providerProps.merging(
           [
             "trigger": reason,
-            "target_day": recapDay,
+            "target_day": targetDay,
+            "source_day": sourceDayString,
             "latency_ms": Int(Date().timeIntervalSince(startedAt) * 1000),
             "highlights_count": draft.highlights.count,
             "tasks_count": draft.tasks.count,
@@ -267,7 +267,7 @@ final class DailyRecapScheduler: @unchecked Sendable {
         ))
 
       await MainActor.run {
-        NotificationService.shared.scheduleDailyRecapReadyNotification(forDay: recapDay)
+        NotificationService.shared.scheduleDailyRecapReadyNotification(forDay: targetDay)
       }
     } catch {
       let nsError = error as NSError
@@ -276,7 +276,8 @@ final class DailyRecapScheduler: @unchecked Sendable {
         providerProps.merging(
           [
             "trigger": reason,
-            "target_day": recapDay,
+            "target_day": targetDay,
+            "source_day": sourceDayString,
             "failure_reason": "api_error",
             "error_domain": nsError.domain,
             "error_code": nsError.code,
@@ -287,62 +288,31 @@ final class DailyRecapScheduler: @unchecked Sendable {
     }
   }
 
-  private func nextRecapTargetDay(
-    fromYesterday yesterdayStart: Date,
-    minimumActivityMinutes: Int,
-    trigger: String
+  private func recapSourceDay(
+    before targetStart: Date,
+    minimumActivityMinutes: Int
   ) -> (dayString: String, startOfDay: Date, endOfDay: Date)? {
     let calendar = Calendar.current
-    guard bootstrapBackfillWindowDays > 0,
-      let windowStart = calendar.date(
-        byAdding: .day,
-        value: -(bootstrapBackfillWindowDays - 1),
-        to: yesterdayStart
-      )
-    else {
-      return nil
-    }
+    guard sourceLookbackWindowDays > 0 else { return nil }
 
-    var scanStart = windowStart
-    if let latestStandupDay = StorageManager.shared.fetchLatestDailyStandupDay() {
-      if let latestStandupDate = DateFormatter.yyyyMMdd.date(from: latestStandupDay),
-        let nextDayAfterLatest = calendar.date(byAdding: .day, value: 1, to: latestStandupDate)
-      {
-        scanStart = max(windowStart, nextDayAfterLatest)
-      } else {
-        AnalyticsService.shared.capture(
-          "daily_auto_generation_check_failed",
-          [
-            "reason": "latest_standup_day_parse_failed",
-            "trigger": trigger,
-            "latest_standup_day": latestStandupDay,
-          ])
+    for offset in 1...sourceLookbackWindowDays {
+      guard
+        let sourceStart = calendar.date(byAdding: .day, value: -offset, to: targetStart)
+      else {
+        continue
       }
-    }
 
-    guard scanStart <= yesterdayStart else {
-      return nil
-    }
-
-    var cursor = scanStart
-    while cursor <= yesterdayStart {
-      let dayString = DateFormatter.yyyyMMdd.string(from: cursor)
-      let hasStandup = StorageManager.shared.fetchDailyStandup(forDay: dayString) != nil
+      let dayString = DateFormatter.yyyyMMdd.string(from: sourceStart)
       let hasMinimumActivity = StorageManager.shared.hasMinimumTimelineActivity(
         forDay: dayString,
         minimumMinutes: minimumActivityMinutes
       )
 
-      if !hasStandup && hasMinimumActivity,
-        let endOfDay = calendar.date(byAdding: .day, value: 1, to: cursor)
+      if hasMinimumActivity,
+        let sourceEnd = calendar.date(byAdding: .day, value: 1, to: sourceStart)
       {
-        return (dayString: dayString, startOfDay: cursor, endOfDay: endOfDay)
+        return (dayString: dayString, startOfDay: sourceStart, endOfDay: sourceEnd)
       }
-
-      guard let next = calendar.date(byAdding: .day, value: 1, to: cursor) else {
-        break
-      }
-      cursor = next
     }
 
     return nil
