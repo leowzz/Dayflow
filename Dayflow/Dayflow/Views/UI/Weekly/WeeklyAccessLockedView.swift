@@ -154,7 +154,7 @@ private struct WeeklyAccessLockCard: View {
           .frame(width: 333, height: 26.4)
 
         Text("Weekly unlocks after 30 hours of recorded timeline data")
-          .font(.custom("Nunito-Regular", size: 14))
+          .font(.custom("Figtree-Regular", size: 14))
           .foregroundStyle(Color(hex: "796E64"))
           .multilineTextAlignment(.center)
           .lineLimit(1)
@@ -173,7 +173,7 @@ private struct WeeklyAccessLockCard: View {
 
       Button(action: onNotify) {
         Text(buttonTitle)
-          .font(.custom("Nunito-Medium", size: 14))
+          .font(.custom("Figtree-Medium", size: 14))
           .foregroundStyle(Color.white)
           .lineLimit(1)
           .minimumScaleFactor(0.72)

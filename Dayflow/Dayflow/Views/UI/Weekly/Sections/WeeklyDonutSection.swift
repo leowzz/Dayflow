@@ -141,7 +141,7 @@ private struct WeeklyDonutCenterContent: View {
   var body: some View {
     VStack(spacing: 4) {
       Text("TOTAL")
-        .font(.custom("Nunito-Bold", size: 8))
+        .font(.custom("Figtree-Bold", size: 8))
         .foregroundStyle(Color(hex: "A5A5A5"))
 
       VStack(spacing: 0) {
@@ -183,7 +183,7 @@ private struct WeeklyDonutLegendRow: View {
           .frame(width: 12, height: 8)
 
         Text(item.name)
-          .font(.custom("Nunito-Regular", size: 14))
+          .font(.custom("Figtree-Regular", size: 14))
           .foregroundStyle(Color.black)
           .lineLimit(1)
       }
@@ -191,7 +191,7 @@ private struct WeeklyDonutLegendRow: View {
       Spacer(minLength: 16)
 
       Text(percentageText)
-        .font(.custom("Nunito-Regular", size: 14))
+        .font(.custom("Figtree-Regular", size: 14))
         .foregroundStyle(Color.black)
     }
   }
@@ -213,7 +213,7 @@ private struct WeeklyDonutEmptyState: View {
 
       VStack(spacing: 4) {
         Text("TOTAL")
-          .font(.custom("Nunito-Bold", size: 8))
+          .font(.custom("Figtree-Bold", size: 8))
           .foregroundStyle(Color(hex: "A5A5A5"))
 
         Text("No activity")

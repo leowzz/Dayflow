@@ -49,7 +49,7 @@ struct WeeklySuggestionsSection: View {
   private func suggestionColumn(title: String, items: [WeeklySuggestionEntry]) -> some View {
     VStack(alignment: .leading, spacing: 12) {
       Text(title)
-        .font(.custom("Nunito-Bold", size: 14))
+        .font(.custom("Figtree-Bold", size: 14))
         .foregroundStyle(Color(hex: "B46531"))
 
       VStack(alignment: .leading, spacing: 12) {
@@ -70,9 +70,9 @@ struct WeeklySuggestionsSection: View {
         .padding(.vertical, 2)
 
       (Text(item.label)
-        .font(.custom("Nunito-Bold", size: 12))
+        .font(.custom("Figtree-Bold", size: 12))
         + Text(" - \(item.detail)")
-        .font(.custom("Nunito-Regular", size: 12)))
+        .font(.custom("Figtree-Regular", size: 12)))
         .foregroundStyle(Color(hex: "333333"))
         .lineSpacing(2)
         .frame(maxWidth: .infinity, alignment: .leading)

@@ -81,7 +81,7 @@ struct WeeklyContextShiftComparisonSection: View {
             .frame(width: 10, height: 10)
 
           Text(series.label)
-            .font(.custom("Nunito-Regular", size: 12))
+            .font(.custom("Figtree-Regular", size: 12))
             .foregroundStyle(Design.labelColor)
         }
       }
@@ -91,7 +91,7 @@ struct WeeklyContextShiftComparisonSection: View {
   private var chartColumn: some View {
     VStack(alignment: .leading, spacing: Design.xAxisTopSpacing) {
       Text("Count")
-        .font(.custom("Nunito-Regular", size: 12))
+        .font(.custom("Figtree-Regular", size: 12))
         .foregroundStyle(Design.labelColor)
 
       comparisonChart
@@ -99,7 +99,7 @@ struct WeeklyContextShiftComparisonSection: View {
       HStack {
         ForEach(snapshot.dayLabels, id: \.self) { label in
           Text(label)
-            .font(.custom("Nunito-Regular", size: 12))
+            .font(.custom("Figtree-Regular", size: 12))
             .foregroundStyle(Design.labelColor)
 
           if label != snapshot.dayLabels.last {
@@ -158,7 +158,7 @@ struct WeeklyContextShiftComparisonSection: View {
   private var insightCard: some View {
     VStack(alignment: .leading, spacing: Design.calloutSpacing) {
       Text(snapshot.insightText)
-        .font(.custom("Nunito-Regular", size: 12))
+        .font(.custom("Figtree-Regular", size: 12))
         .foregroundStyle(Design.labelColor)
         .fixedSize(horizontal: false, vertical: true)
 
@@ -169,7 +169,7 @@ struct WeeklyContextShiftComparisonSection: View {
             .foregroundStyle(Design.labelColor)
 
           Text(snapshot.callToAction)
-            .font(.custom("Nunito-Regular", size: 12))
+            .font(.custom("Figtree-Regular", size: 12))
             .foregroundStyle(Design.labelColor)
         }
         .padding(.horizontal, Design.buttonHorizontalPadding)

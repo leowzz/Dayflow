@@ -35,7 +35,7 @@ struct WeeklyHighlightsSection: View {
               .frame(width: 84, alignment: .leading)
 
             Text(highlight.text)
-              .font(.custom("Nunito-Regular", size: 12))
+              .font(.custom("Figtree-Regular", size: 12))
               .foregroundStyle(Color(hex: "333333"))
               .lineSpacing(1)
               .frame(width: 322, alignment: .leading)

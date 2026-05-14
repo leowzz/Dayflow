@@ -37,7 +37,7 @@ struct WeeklyInteractionGraphPrototypeSection: View {
         .offset(x: Design.titleOrigin.x, y: Design.titleOrigin.y)
 
       Text(snapshot.subtitle)
-        .font(.custom("Nunito-Regular", size: 12))
+        .font(.custom("Figtree-Regular", size: 12))
         .foregroundStyle(.black)
         .offset(x: Design.subtitleOrigin.x, y: Design.subtitleOrigin.y)
 

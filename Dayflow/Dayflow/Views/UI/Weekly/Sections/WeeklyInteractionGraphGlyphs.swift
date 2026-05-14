@@ -403,7 +403,7 @@ struct WeeklyInteractionGraphLegend: View {
         .frame(width: 16, height: 12)
 
       Text(title)
-        .font(.custom("Nunito-Regular", size: 12))
+        .font(.custom("Figtree-Regular", size: 12))
         .foregroundStyle(.black)
     }
   }

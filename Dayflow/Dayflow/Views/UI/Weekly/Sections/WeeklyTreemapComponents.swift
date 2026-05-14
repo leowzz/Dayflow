@@ -88,7 +88,7 @@ struct WeeklyTreemapCategoryHeader: View {
 
   var titleText: some View {
     Text(category.name)
-      .font(.custom("Nunito-Regular", size: 12))
+      .font(.custom("Figtree-Regular", size: 12))
       .foregroundStyle(category.palette.headerText)
       .lineLimit(1)
       .minimumScaleFactor(0.8)
@@ -96,7 +96,7 @@ struct WeeklyTreemapCategoryHeader: View {
 
   var durationText: some View {
     Text(category.formattedDuration)
-      .font(.custom("Nunito-Regular", size: 12))
+      .font(.custom("Figtree-Regular", size: 12))
       .foregroundStyle(category.palette.headerText)
       .lineLimit(1)
       .minimumScaleFactor(0.8)
@@ -168,7 +168,7 @@ struct WeeklyTreemapLeafTile: View {
       nameRow(fontSize: typography.nameFontSize)
 
       Text(app.formattedDuration)
-        .font(.custom("Nunito-Regular", size: typography.detailFontSize))
+        .font(.custom("Figtree-Regular", size: typography.detailFontSize))
         .foregroundStyle(Color(hex: "333333"))
         .lineLimit(1)
         .minimumScaleFactor(0.85)
@@ -188,7 +188,7 @@ struct WeeklyTreemapLeafTile: View {
       nameRow(fontSize: max(typography.nameFontSize - 2, 11))
 
       Text(app.formattedDuration)
-        .font(.custom("Nunito-Regular", size: max(typography.detailFontSize - 1, 10)))
+        .font(.custom("Figtree-Regular", size: max(typography.detailFontSize - 1, 10)))
         .foregroundStyle(Color(hex: "333333"))
         .lineLimit(1)
         .minimumScaleFactor(0.85)
@@ -263,7 +263,7 @@ struct WeeklyTreemapHoverCard: View {
         .lineLimit(1)
 
       Text(app.formattedDuration)
-        .font(.custom("Nunito-Regular", size: 12))
+        .font(.custom("Figtree-Regular", size: 12))
         .foregroundStyle(Color(hex: "333333"))
         .lineLimit(1)
 

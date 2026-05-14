@@ -29,7 +29,7 @@ private struct WeeklyApplicationNetworkPane: View {
           .foregroundStyle(Color(hex: "B46531"))
 
         Text(snapshot.subtitle)
-          .font(.custom("Nunito-Regular", size: 12))
+          .font(.custom("Figtree-Regular", size: 12))
           .foregroundStyle(Color.black)
       }
       .offset(x: 29, y: 28)
@@ -80,7 +80,7 @@ private struct WeeklyApplicationNetworkPane: View {
         )
 
       Text(title)
-        .font(.custom("Nunito-Regular", size: 12))
+        .font(.custom("Figtree-Regular", size: 12))
         .foregroundStyle(Color.black)
     }
   }
@@ -105,7 +105,7 @@ private struct WeeklyApplicationNodeView: View {
       .opacity(node.isMuted ? 0.3 : 1)
       .overlay {
         Text(node.mark)
-          .font(.custom("Nunito-Bold", size: node.isPrimary ? 20 : 13))
+          .font(.custom("Figtree-Bold", size: node.isPrimary ? 20 : 13))
           .foregroundStyle(node.markColor)
       }
       .overlay {
@@ -178,7 +178,7 @@ private struct WeeklyPatternFlow: View {
       }
 
       Text(pattern.description)
-        .font(.custom("Nunito-Regular", size: 10))
+        .font(.custom("Figtree-Regular", size: 10))
         .foregroundStyle(Color.black)
         .lineSpacing(1)
         .frame(width: 340, alignment: .leading)
@@ -192,12 +192,12 @@ private struct WeeklyPatternFlow: View {
         .frame(width: 14, height: 14)
         .overlay {
           Text(app.initial)
-            .font(.custom("Nunito-Bold", size: 8))
+            .font(.custom("Figtree-Bold", size: 8))
             .foregroundStyle(Color.white)
         }
 
       Text(app.name)
-        .font(.custom("Nunito-Regular", size: 14))
+        .font(.custom("Figtree-Regular", size: 14))
         .foregroundStyle(Color.black)
         .lineLimit(1)
     }
@@ -239,12 +239,12 @@ private struct WeeklyRabbitHoleFlow: View {
         .frame(width: 14, height: 14)
         .overlay {
           Text(app.initial)
-            .font(.custom("Nunito-Bold", size: 8))
+            .font(.custom("Figtree-Bold", size: 8))
             .foregroundStyle(Color.white)
         }
 
       Text(app.name)
-        .font(.custom("Nunito-Regular", size: 14))
+        .font(.custom("Figtree-Regular", size: 14))
         .foregroundStyle(Color.black)
         .lineLimit(1)
     }
@@ -276,7 +276,7 @@ private func averagePill(
       }
 
     Text(text)
-      .font(.custom("Nunito-Regular", size: 12))
+      .font(.custom("Figtree-Regular", size: 12))
       .foregroundStyle(Color.black)
       .lineLimit(1)
   }
@@ -297,7 +297,7 @@ private func flowCounter(_ count: Int, color: Color) -> some View {
       .frame(width: 12, height: 1)
 
     Text("\(count)")
-      .font(.custom("Nunito-Regular", size: 8))
+      .font(.custom("Figtree-Regular", size: 8))
       .foregroundStyle(Color.white)
       .frame(minWidth: 16, minHeight: 14)
       .background(color)

@@ -106,7 +106,7 @@ struct WeeklyFocusHeatmapSection: View {
         Spacer(minLength: 8)
         Text(snapshot.distractedLabel)
       }
-      .font(.custom("Nunito-Regular", size: 10))
+      .font(.custom("Figtree-Regular", size: 10))
       .foregroundStyle(Color.black)
       .frame(width: Design.legendWidth)
     }
@@ -123,7 +123,7 @@ struct WeeklyFocusHeatmapSection: View {
     VStack(alignment: .leading, spacing: resolvedCellGap) {
       ForEach(snapshot.rows) { row in
         Text(row.label)
-          .font(.custom("Nunito-Regular", size: 10))
+          .font(.custom("Figtree-Regular", size: 10))
           .foregroundStyle(Color.black)
           .frame(width: Design.labelsWidth, height: Design.rowHeight, alignment: .leading)
       }
@@ -148,7 +148,7 @@ struct WeeklyFocusHeatmapSection: View {
       HStack {
         ForEach(Array(snapshot.timeLabels.enumerated()), id: \.offset) { entry in
           Text(entry.element)
-            .font(.custom("Nunito-Regular", size: 10))
+            .font(.custom("Figtree-Regular", size: 10))
             .foregroundStyle(Color.black)
 
           if entry.offset < snapshot.timeLabels.count - 1 {
@@ -398,13 +398,13 @@ private struct WeeklyFocusHeatmapGapPreview: View {
     VStack(alignment: .leading, spacing: 16) {
       HStack(spacing: 12) {
         Text("Gap")
-          .font(.custom("Nunito-Regular", size: 12))
+          .font(.custom("Figtree-Regular", size: 12))
 
         Slider(value: $cellGap, in: 0...1.5, step: 0.1)
           .frame(width: 220)
 
         Text("\(cellGap, format: .number.precision(.fractionLength(1))) pt")
-          .font(.custom("Nunito-Regular", size: 12))
+          .font(.custom("Figtree-Regular", size: 12))
           .monospacedDigit()
       }
 

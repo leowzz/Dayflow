@@ -16,7 +16,7 @@ struct WeeklyTreemapPreviewHarness: View {
             selectedDataset = dataset
           } label: {
             Text(dataset.title)
-              .font(.custom("Nunito-Regular", size: 12))
+              .font(.custom("Figtree-Regular", size: 12))
               .foregroundStyle(selectedDataset == dataset ? Color.white : Color(hex: "7C5A46"))
               .padding(.horizontal, 12)
               .padding(.vertical, 6)

@@ -208,7 +208,7 @@ private struct WeeklyOverviewTimelineChart: View {
         VStack(alignment: .leading, spacing: 6) {
           ForEach(snapshot.rows) { row in
             Text(row.label)
-              .font(.custom("Nunito-Regular", size: 12))
+              .font(.custom("Figtree-Regular", size: 12))
               .foregroundStyle(Color.black)
               .frame(width: Design.dayLabelWidth, height: 14, alignment: .leading)
           }
@@ -224,7 +224,7 @@ private struct WeeklyOverviewTimelineChart: View {
           HStack {
             ForEach(Design.axisLabels, id: \.self) { label in
               Text(label)
-                .font(.custom("Nunito-Regular", size: 10))
+                .font(.custom("Figtree-Regular", size: 10))
                 .foregroundStyle(Color.black)
               if label != Design.axisLabels.last {
                 Spacer(minLength: 0)
@@ -239,7 +239,7 @@ private struct WeeklyOverviewTimelineChart: View {
         ForEach(snapshot.legendItems) { item in
           HStack(spacing: 6) {
             Text(item.name)
-              .font(.custom("Nunito-Regular", size: 10))
+              .font(.custom("Figtree-Regular", size: 10))
               .foregroundStyle(Color.black)
 
             RoundedRectangle(cornerRadius: 1.5, style: .continuous)
@@ -315,19 +315,19 @@ private struct WeeklyOverviewTabStrip: View {
     VStack(alignment: .leading, spacing: 6) {
       HStack(spacing: 12) {
         Text("All")
-          .font(.custom("Nunito-Bold", size: 12))
+          .font(.custom("Figtree-Bold", size: 12))
           .foregroundStyle(Color(hex: "333333"))
 
         Text("Longest focus period")
-          .font(.custom("Nunito-Medium", size: 12))
+          .font(.custom("Figtree-Medium", size: 12))
           .foregroundStyle(Color(hex: "333333"))
 
         Text("Least context shifts")
-          .font(.custom("Nunito-Medium", size: 12))
+          .font(.custom("Figtree-Medium", size: 12))
           .foregroundStyle(Color(hex: "333333"))
 
         Text("Most context shifts")
-          .font(.custom("Nunito-Medium", size: 12))
+          .font(.custom("Figtree-Medium", size: 12))
           .foregroundStyle(Color(hex: "333333"))
       }
 
@@ -352,7 +352,7 @@ private struct WeeklyOverviewSummaryGroup: View {
         ForEach(metrics) { metric in
           VStack(alignment: .leading, spacing: 8) {
             Text(metric.label)
-              .font(.custom("Nunito-Regular", size: 12))
+              .font(.custom("Figtree-Regular", size: 12))
               .foregroundStyle(Color(hex: "777777"))
 
             Text(metric.value)

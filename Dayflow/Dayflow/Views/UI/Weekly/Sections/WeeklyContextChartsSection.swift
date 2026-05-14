@@ -48,7 +48,7 @@ private struct WeeklyContextDistributionCard: View {
         VStack {
           ForEach(hourTicks, id: \.self) { tick in
             Text(tick)
-              .font(.custom("Nunito-Regular", size: 8))
+              .font(.custom("Figtree-Regular", size: 8))
               .foregroundStyle(Color.black)
 
             if tick != hourTicks.last {
@@ -66,7 +66,7 @@ private struct WeeklyContextDistributionCard: View {
       HStack(spacing: 8) {
         ForEach(snapshot.days, id: \.self) { day in
           Text(day)
-            .font(.custom("Nunito-Regular", size: 10))
+            .font(.custom("Figtree-Regular", size: 10))
             .foregroundStyle(Color.black)
             .frame(maxWidth: .infinity)
         }
@@ -133,7 +133,7 @@ private struct WeeklyContextDistributionCard: View {
         .frame(width: 9, height: 9)
 
       Text(title)
-        .font(.custom("Nunito-Regular", size: 10))
+        .font(.custom("Figtree-Regular", size: 10))
         .foregroundStyle(Color.black)
     }
   }
@@ -201,7 +201,7 @@ private struct WeeklyContextComparisonBarCard: View {
           .frame(height: 192, alignment: .bottom)
 
           Text(day.day)
-            .font(.custom("Nunito-Regular", size: 12))
+            .font(.custom("Figtree-Regular", size: 12))
             .foregroundStyle(Color.black)
             .padding(.top, 10)
         }
@@ -226,7 +226,7 @@ private struct WeeklyContextComparisonBarCard: View {
 
     return VStack(spacing: 4) {
       Text("\(value)")
-        .font(.custom("Nunito-Regular", size: 10))
+        .font(.custom("Figtree-Regular", size: 10))
         .foregroundStyle(color)
 
       RoundedRectangle(cornerRadius: 3, style: .continuous)
@@ -260,7 +260,7 @@ private struct WeeklyContextComparisonBarCard: View {
         .frame(width: 10, height: 10)
 
       Text(title)
-        .font(.custom("Nunito-Regular", size: 10))
+        .font(.custom("Figtree-Regular", size: 10))
         .foregroundStyle(Color.black)
     }
   }
@@ -274,7 +274,7 @@ private struct WeeklyContextComparisonBarCard: View {
           .padding(.top, 3)
 
         Text(snapshot.insight)
-          .font(.custom("Nunito-Regular", size: 12))
+          .font(.custom("Figtree-Regular", size: 12))
           .foregroundStyle(Color.black)
           .lineSpacing(1)
           .frame(width: 389, alignment: .leading)
@@ -283,7 +283,7 @@ private struct WeeklyContextComparisonBarCard: View {
       Spacer(minLength: 0)
 
       Button("Highlight pattern") {}
-        .font(.custom("Nunito-Regular", size: 12))
+        .font(.custom("Figtree-Regular", size: 12))
         .foregroundStyle(Color.black)
         .buttonStyle(.plain)
         .padding(.horizontal, 12)

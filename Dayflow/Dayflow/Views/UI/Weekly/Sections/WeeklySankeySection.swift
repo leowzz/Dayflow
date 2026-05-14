@@ -47,7 +47,7 @@ struct WeeklySankeySection: View {
   private var controls: some View {
     HStack(spacing: 8) {
       Text(model.seedLabel)
-        .font(.custom("Nunito-Medium", size: 11))
+        .font(.custom("Figtree-Medium", size: 11))
         .foregroundStyle(Color(hex: "B16845"))
 
       Spacer(minLength: 12)
@@ -77,7 +77,7 @@ struct WeeklySankeySection: View {
   ) -> some View {
     Button(action: action) {
       Text(title)
-        .font(.custom("Nunito-Medium", size: 11))
+        .font(.custom("Figtree-Medium", size: 11))
         .foregroundStyle(dataset == targetDataset ? Color(hex: "FF6B14") : Color(hex: "D77A43"))
         .padding(.horizontal, 9)
         .frame(height: 23)
@@ -414,7 +414,7 @@ private struct WeeklySankeyPlainLabel: View {
   var body: some View {
     VStack(alignment: .leading, spacing: 2) {
       Text(node.name)
-        .font(.custom("Nunito-Regular", size: 10))
+        .font(.custom("Figtree-Regular", size: 10))
         .foregroundStyle(Color.black)
         .lineLimit(1)
 
@@ -437,7 +437,7 @@ private struct WeeklySankeyPlainLabel: View {
         .frame(width: 0.5, height: 11)
       Text(node.percent)
     }
-    .font(.custom("Nunito-Regular", size: fontSize))
+    .font(.custom("Figtree-Regular", size: fontSize))
     .foregroundStyle(Color(hex: "717171"))
     .lineLimit(1)
   }
@@ -456,7 +456,7 @@ private struct WeeklySankeyAppLabel: View {
 
       HStack(alignment: .firstTextBaseline, spacing: 5) {
         Text(node.name)
-          .font(.custom("Nunito-Regular", size: 10))
+          .font(.custom("Figtree-Regular", size: 10))
           .foregroundStyle(Color.black)
           .lineLimit(1)
 
@@ -467,7 +467,7 @@ private struct WeeklySankeyAppLabel: View {
             .frame(width: 0.5, height: 10)
           Text(node.percent)
         }
-        .font(.custom("Nunito-Regular", size: 9))
+        .font(.custom("Figtree-Regular", size: 9))
         .foregroundStyle(Color(hex: "717171"))
         .lineLimit(1)
       }
@@ -517,7 +517,7 @@ private struct WeeklySankeyIconView: View {
       .fill(Color(hex: backgroundHex))
       .overlay {
         Text(text)
-          .font(.custom("Nunito-Bold", size: 8))
+          .font(.custom("Figtree-Bold", size: 8))
           .foregroundStyle(Color(hex: foregroundHex))
       }
   }

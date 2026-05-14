@@ -709,11 +709,11 @@ private struct WeeklyGeneratedWithDayflowText: View {
   var body: some View {
     HStack(spacing: 3) {
       Text("Generated with")
-        .font(.custom("Nunito-SemiBold", size: 10))
+        .font(.custom("Figtree-SemiBold", size: 10))
         .foregroundStyle(Color(hex: "786A61"))
 
       Text("Dayflow")
-        .font(.custom("Nunito-Bold", size: 10))
+        .font(.custom("Figtree-Bold", size: 10))
         .foregroundStyle(Color(hex: "B46531"))
     }
   }
